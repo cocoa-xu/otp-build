@@ -16,11 +16,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Download OTP Source Code
         run: |
-          echo "$GITHUB_REF"
           export OTP_VERSION=${GITHUB_REF##*/v}
-          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VER}/otp_src_${OTP_VER}.tar.gz" -o "otp_src_${OTP_VER}.tar.gz"
-          tar -xzf "otp_src_${OTP_VER}.tar.gz"
-          cd "otp_src_${OTP_VER}"
+          echo "$OTP_VERSION"
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz"
+          tar -xzf "otp_src_${OTP_VERSION}.tar.gz"
+          cd "otp_src_${OTP_VERSION}"
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             export CC="clang -arch arm64"
             export CXX="clang -arch arm64"

@@ -22,11 +22,6 @@ jobs:
           tar -xzf "otp_src_${OTP_VERSION}.tar.gz"
           cd "otp_src_${OTP_VERSION}"
           if [ "${{ matrix.arch }}" = "arm64" ]; then
-            export CC="clang -arch arm64"
-            export CXX="clang -arch arm64"
-            export CFLAGS="-arch arm64 -O2 -g"
-            export CXXFLAGS="-arch arm64 -O2 -g"
-            export LDFLAGS="-arch arm64"
             ./configure --host=aarch64-apple-darwin
           else
             ./configure

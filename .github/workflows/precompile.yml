@@ -27,8 +27,10 @@ jobs:
             export CFLAGS="-arch arm64"
             export CXXFLAGS="-arch arm64"
             export LDFLAGS="-arch arm64"
+            ./configure --host=aarch64-apple-darwin
+          else
+            ./configure
           fi
-          ./configure
           time make -j"$(sysctl -n hw.ncpu)"
           mkdir "otp_${OTP_VERSION}"
           make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install

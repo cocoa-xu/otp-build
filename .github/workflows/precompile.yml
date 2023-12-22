@@ -32,7 +32,7 @@ jobs:
             make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
           fi
           mkdir -p build
-          tar -czf "build/otp_${OTP_VERSION}.tar.gz" . -C "$(pwd)/otp_${OTP_VERSION}"
+          tar -czf "$(pwd)/build/otp_${OTP_VERSION}.tar.gz" . -C "$(pwd)/otp_${OTP_VERSION}"
 
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

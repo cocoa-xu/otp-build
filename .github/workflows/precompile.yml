@@ -22,7 +22,9 @@ jobs:
           tar -xzf "otp_src_${OTP_VERSION}.tar.gz"
           cd "otp_src_${OTP_VERSION}"
           if [ "${{ matrix.arch }}" = "arm64" ]; then
-            ./configure --host=aarch64-apple-darwin
+            ./configure --enable-bootstrap-only
+            make -j"$(sysctl -n hw.ncpu)"
+            ./configure --host=aarch64-apple-darwin --build=x86_64-apple-darwin
           else
             ./configure
           fi

@@ -25,15 +25,14 @@ jobs:
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             ./otp_build configure --xcomp-conf=xcomp/erl-xcomp-aarch64-darwin.conf
             ./otp_build boot -a
-            
-            ./otp_build release -a "otp_${OTP_VERSION}"
+            ./otp_build release -a "$(pwd)/otp_${OTP_VERSION}"
           else
             ./configure
             time make -j"$(sysctl -n hw.ncpu)"
             make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
           fi
           mkdir -p build
-          tar -czf "build/otp_${OTP_VERSION}.tar.gz" otp_${OTP_VERSION}
+          tar -czf "build/otp_${OTP_VERSION}.tar.gz" . -C "$(pwd)/otp_${OTP_VERSION}"
 
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

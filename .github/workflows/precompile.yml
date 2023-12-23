@@ -42,7 +42,7 @@ jobs:
           fi
           mkdir -p "${ROOTDIR}/build"
           cd "$(pwd)/otp_${OTP_VERSION}"
-          tar -czf "${ROOTDIR}/build/otp_${OTP_VERSION}.tar.gz" . 
+          tar -czf "${ROOTDIR}/build/otp-v${OTP_VERSION}_${{ matrix.arch }}-apple-darwin.tar.gz" .
 
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

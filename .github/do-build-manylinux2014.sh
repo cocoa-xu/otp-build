@@ -13,11 +13,12 @@ yum install -y ncurses-devel && \
     cd / && \
     curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/${OPENSSL_ARCHIVE}" -o "${OPENSSL_ARCHIVE}" && \
     tar -xf "${OPENSSL_ARCHIVE}" && \
+    mv "${OPENSSL_ARCHIVE%.tar.gz}" "${PERFIX_DIR}" && \
     curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" && \
     tar -xf "otp_src_${OTP_VERSION}.tar.gz" && \
     cd "otp_src_${OTP_VERSION}" && \
-    ./configure --without-javac --with-ssl="${PERFIX_DIR}" && \
+    ./configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib && \
     make -j"$(nproc)" && \
     make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install && \
     cd "otp_${OTP_VERSION}" && \
-    tar -czf "/work/otp-${OTP_VERSION}_${ARCH}-linux-gnu.tar.gz" .
+    tar -czf "/work/otp-${ARCH}-linux-gnu.tar.gz" .

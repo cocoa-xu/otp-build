@@ -13,6 +13,40 @@ permissions:
   contents: write
 
 jobs:
+  linux:
+    runs-on: ubuntu-latest
+    env:
+      OPENSSL_VERSION: "3.2.0"
+    strategy:
+      matrix:
+        arch: [x86_64, i686, aarch64, ppc64le, s390x]
+
+    name: manylinux2014_${{ matrix.arch }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pull docker image
+        run: |
+          sudo docker pull quay.io/pypa/manylinux2014_${{ matrix.arch }}:latest
+
+      - name: Install binfmt
+        run: |
+          sudo apt install -y binfmt-support qemu-user-static
+
+      - name: Precompile
+        run: |
+          cp .github/script-to-build-manylinux2014.sh ./
+          cp .github/do-build-manylinux2014.sh ./
+
+          bash ./script-to-build-manylinux2014.sh "${GITHUB_REF##*/v}" "${{ matrix.arch }}"
+
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            otp-*.tar.gz
+
   macos:
     runs-on: macos-12
     strategy:

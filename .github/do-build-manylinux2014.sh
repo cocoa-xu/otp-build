@@ -12,8 +12,7 @@ OPENSSL_ARCHIVE="openssl-${ARCH}-linux-gnu.tar.gz"
 yum install -y ncurses-devel && \
     cd / && \
     curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/${OPENSSL_ARCHIVE}" -o "${OPENSSL_ARCHIVE}" && \
-    tar -xf "${OPENSSL_ARCHIVE}" && \
-    mv "${OPENSSL_ARCHIVE%.tar.gz}" "${PERFIX_DIR}" && \
+    tar -C / -xf "${OPENSSL_ARCHIVE}" && \
     curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" && \
     tar -xf "otp_src_${OTP_VERSION}.tar.gz" && \
     cd "otp_src_${OTP_VERSION}" && \

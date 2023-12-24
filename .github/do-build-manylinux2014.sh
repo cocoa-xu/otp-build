@@ -6,7 +6,7 @@ OTP_VERSION=$1
 ARCH=$2
 
 OPENSSL_VERSION=${OPENSSL_VERSION:-3.2.0}
-PERFIX_DIR="/openssl-${ARCH}-linux-gnu"
+PERFIX_DIR="/work/openssl-${ARCH}-linux-gnu"
 OPENSSL_ARCHIVE="openssl-${ARCH}-linux-gnu.tar.gz"
 
 if [ -d "/usr/lib64" ]; then
@@ -17,7 +17,7 @@ yum install -y ncurses-devel curl && \
     cd / && \
     curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" && \
     curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/${OPENSSL_ARCHIVE}" -o "${OPENSSL_ARCHIVE}" && \
-    tar -C / -xf "${OPENSSL_ARCHIVE}" && \
+    tar -C /work -xf "${OPENSSL_ARCHIVE}" && \
     tar -xf "otp_src_${OTP_VERSION}.tar.gz" && \
     cd "otp_src_${OTP_VERSION}" && \
     ./configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib && \

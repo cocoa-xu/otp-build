@@ -15,9 +15,9 @@ fi
 
 yum install -y ncurses-devel curl && \
     cd / && \
+    curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" && \
     curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/${OPENSSL_ARCHIVE}" -o "${OPENSSL_ARCHIVE}" && \
     tar -C / -xf "${OPENSSL_ARCHIVE}" && \
-    curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" && \
     tar -xf "otp_src_${OTP_VERSION}.tar.gz" && \
     cd "otp_src_${OTP_VERSION}" && \
     ./configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib && \

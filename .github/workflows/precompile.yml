@@ -117,10 +117,7 @@ jobs:
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             ./otp_build configure --xcomp-conf=xcomp/erl-xcomp-aarch64-darwin.conf --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
             ./otp_build boot -a
-            ./otp_build release -a "$(pwd)/otp_${OTP_VERSION}"
-            cd "$(pwd)/otp_${OTP_VERSION}"
-            ./Install $(pwd)
-            cd "${ROOTDIR}/otp_src_${OTP_VERSION}"
+            make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
           else
             ./configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
             time make -j"$(sysctl -n hw.ncpu)"

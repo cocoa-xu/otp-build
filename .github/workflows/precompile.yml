@@ -35,7 +35,7 @@ jobs:
       - name: Download Precompiled OpenSSL
         if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.arch }}-apple-darwin.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-gnu.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.arch }}-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-gnu.tar.gz"
       - name: Cache OTP Source Code
         id: cache-otp
         uses: actions/cache@v3

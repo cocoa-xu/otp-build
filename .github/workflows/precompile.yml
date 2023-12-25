@@ -56,7 +56,7 @@ jobs:
       - name: Install binfmt
         run: |
           sudo apt install -y binfmt-support qemu-user-static
-      - name: Precompile
+      - name: Compile OTP
         run: |
           cp .github/script-to-build-manylinux2014.sh ./
           cp .github/do-build-manylinux2014.sh ./
@@ -103,15 +103,16 @@ jobs:
           echo "OTP_VERSION: $OTP_VERSION"
           echo "github.ref_name: ${{ github.ref_name }}"
           curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
-      - name: Download OTP Source Code
+      - name: Compile OTP
         run: |
           export ROOTDIR="$(pwd)"
           export OPENSSL_ARCHIVE="openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-apple-darwin.tar.gz"
           export PERFIX_DIR="/tmp/openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-apple-darwin"
+          export OTP_VERSION="${GITHUB_REF##*/v}"
           mkdir -p "${PERFIX_DIR}"
           sudo tar -C "${PERFIX_DIR}" -xf "${OPENSSL_ARCHIVE}"
           tar -xzf "otp_src_${{ github.ref_name }}.tar.gz"
-          cd "otp_src_${{ github.ref_name }}"
+          cd "otp_src_${OTP_VERSION}"
           mkdir "otp_${OTP_VERSION}"
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             ./otp_build configure --xcomp-conf=xcomp/erl-xcomp-aarch64-darwin.conf --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib

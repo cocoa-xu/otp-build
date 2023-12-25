@@ -6,17 +6,11 @@ OTP_VERSION=$1
 ARCH=$2
 
 OPENSSL_VERSION=${OPENSSL_VERSION:-3.2.0}
-PERFIX_DIR="/work/openssl-${ARCH}-linux-gnu"
-OPENSSL_ARCHIVE="openssl-${ARCH}-linux-gnu.tar.gz"
+PERFIX_DIR="/work/openssl-${OPENSSL_VERSION}-${ARCH}-linux-gnu"
+OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${ARCH}-linux-gnu.tar.gz"
 
-if [ -d "/usr/lib64" ]; then
-    ln -s /usr/lib64 /lib64
-fi
-
-yum install -y ncurses-devel curl && \
-    cd / && \
-    curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" && \
-    curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/${OPENSSL_ARCHIVE}" -o "${OPENSSL_ARCHIVE}" && \
+yum install -y ncurses-devel && \
+    cd /work && \
     mkdir -p "${PERFIX_DIR}" && \
     tar -C "${PERFIX_DIR}" -xf "${OPENSSL_ARCHIVE}" && \
     tar -xf "otp_src_${OTP_VERSION}.tar.gz" && \

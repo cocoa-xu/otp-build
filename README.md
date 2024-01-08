@@ -80,7 +80,7 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
   </tr>
   <tr>
-    <td>i686</td>
+    <td>i386</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>

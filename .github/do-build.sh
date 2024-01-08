@@ -13,7 +13,7 @@ OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
 
 case $TRIPLET in
     *-linux-musl)
-        apk add gcc g++ perl ncurses-dev
+        apk add gcc g++ perl ncurses-dev make
         ;;
     *-linux-gnu)
         ;;

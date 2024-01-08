@@ -12,10 +12,8 @@ OPENSSL_PERFIX_DIR="/work/openssl-${OPENSSL_VERSION}-${TRIPLET}"
 OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
 
 case $TRIPLET in
-    riscv64-linux-gnu )
-        apt update && apt install -y gcc g++ perl libncurses-dev make
-        ;;
     *-linux-gnu )
+        apt update && apt install -y gcc g++ perl libncurses5-dev make
         ;;
     *-linux-musl )
         apk add gcc g++ perl ncurses-dev make

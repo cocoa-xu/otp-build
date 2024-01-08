@@ -32,7 +32,7 @@ Precompiled OTP for NIF library CI builds.
     <td></td>
   </tr>
   <tr>
-    <td rowspan="5">Linux</td>
+    <td rowspan="6">Linux</td>
     <td>x86_64-linux-gnu</td>
     <td>✓</td>
     <td>✓</td>
@@ -58,6 +58,12 @@ Precompiled OTP for NIF library CI builds.
   </tr>
   <tr>
     <td>s390x-linux-gnu</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>x86_64-linux-musl</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>

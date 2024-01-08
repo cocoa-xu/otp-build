@@ -2,6 +2,74 @@
 
 Precompiled OTP for NIF library CI builds.
 
+### Availability
+
+<table>
+<thead>
+  <tr>
+    <th colspan="2" rowspan="2">Availability<br></th>
+    <th colspan="3">Erlang/OTP Versions</th>
+  </tr>
+  <tr>
+    <th>26.2.1</th>
+    <th>25.3.2.8</th>
+    <th>24.3.4.15</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Linux</td>
+    <td>x86_64-linux-gnu</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>i686-linux-gnu</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>aarch64-linux-gnu</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>ppc64le-linux-gnu</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>s390x-linux-gnu</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>arm64-apple-darwin</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>x86_64-apple-darwin</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+</tbody>
+</table>
+
+### Available Precompiled Architectures
+
 ## Example
 
 ```yaml

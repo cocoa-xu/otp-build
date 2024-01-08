@@ -7,11 +7,12 @@ Precompiled OTP for NIF library CI builds.
 <table>
 <thead>
   <tr>
-    <th colspan="5">Availability<br></th>
+    <th colspan="6">Availability</th>
   </tr>
 </thead>
 <tbody>
   <tr>
+    <td></td>
     <td></td>
     <td><b>NIF Version →</b></td>
     <td>2.17</td>
@@ -19,64 +20,105 @@ Precompiled OTP for NIF library CI builds.
   </tr>
   <tr>
     <td></td>
+    <td></td>
     <td><b>Erlang/OTP Version →</b></td>
     <td>26.2.1</td>
     <td>25.3.2.8</td>
     <td>24.3.4.15</td>
   </tr>
   <tr>
-    <td><b>Platform ↓</b></td>
-    <td><b>Target Triplet ↓</b></td>
+    <td><b>OS ↓</b></td>
+    <td><b>ABI ↓</b></td>
+    <td><b>Architecture ↓</b></td>
     <td></td>
     <td></td>
     <td></td>
   </tr>
   <tr>
-    <td rowspan="6">Linux</td>
-    <td>x86_64-linux-gnu</td>
+    <td rowspan="12">Linux</td>
+    <td rowspan="6">gnu</td>
+    <td>x86_64</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td>i686-linux-gnu</td>
+    <td>i686</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td>aarch64-linux-gnu</td>
+    <td>aarch64</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td>ppc64le-linux-gnu</td>
+    <td>riscv64</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td>s390x-linux-gnu</td>
+    <td>ppcle64</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td>x86_64-linux-musl</td>
+    <td>s390x</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="6">musl</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i686</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppcle64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
     <td rowspan="2">macOS</td>
-    <td>arm64-apple-darwin</td>
+    <td rowspan="2">darwin</td>
+    <td>arm64</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td>x86_64-apple-darwin</td>
+    <td>x86_64</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>

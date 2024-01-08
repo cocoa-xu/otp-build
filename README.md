@@ -68,8 +68,6 @@ Precompiled OTP for NIF library CI builds.
 </tbody>
 </table>
 
-### Available Precompiled Architectures
-
 ## Example
 
 ```yaml

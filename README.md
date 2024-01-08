@@ -39,28 +39,24 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
   </tr>
   <tr>
-    <td></td>
     <td>i686-linux-gnu</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td></td>
     <td>aarch64-linux-gnu</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td></td>
     <td>ppc64le-linux-gnu</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
   </tr>
   <tr>
-    <td></td>
     <td>s390x-linux-gnu</td>
     <td>✓</td>
     <td>✓</td>

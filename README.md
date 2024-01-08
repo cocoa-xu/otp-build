@@ -7,16 +7,30 @@ Precompiled OTP for NIF library CI builds.
 <table>
 <thead>
   <tr>
-    <th colspan="2" rowspan="2">Availability<br></th>
-    <th colspan="3">Erlang/OTP Versions</th>
-  </tr>
-  <tr>
-    <th>26.2.1</th>
-    <th>25.3.2.8</th>
-    <th>24.3.4.15</th>
+    <th colspan="5">Availability<br></th>
   </tr>
 </thead>
 <tbody>
+  <tr>
+    <td></td>
+    <td>NIF Version</td>
+    <td>2.17</td>
+    <td colspan="2">2.16</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Erlang/OTP Version</td>
+    <td>26.2.1</td>
+    <td>25.3.2.8</td>
+    <td>24.3.4.15</td>
+  </tr>
+  <tr>
+    <td>Platform</td>
+    <td>Target Triplet</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
   <tr>
     <td>Linux</td>
     <td>x86_64-linux-gnu</td>

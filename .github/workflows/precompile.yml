@@ -148,10 +148,10 @@ jobs:
           fi
 
       - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') 
         with:
           files: |
-            build/*.tar.gz
+            otp-*.tar.gz
 
   deploy-linux:
     runs-on: ubuntu-latest

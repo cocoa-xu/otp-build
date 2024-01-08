@@ -141,7 +141,11 @@ jobs:
           cp .github/script-to-build-musl.sh ./
           cp .github/do-build.sh ./
 
-          bash ./script-to-build-musl.sh "${GITHUB_REF##*/v}" "${{ matrix.arch }}"
+          if [ "${{ matrix.arch }}" = "riscv64" ]; then
+            bash ./script-to-build-musl.sh "${GITHUB_REF##*/v}" "${{ matrix.arch }}" "alpine:edge"
+          else
+            bash ./script-to-build-musl.sh "${GITHUB_REF##*/v}" "${{ matrix.arch }}" "alpine:latest"
+          fi
 
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

@@ -19,12 +19,14 @@ jobs:
       OPENSSL_VERSION: "3.2.0"
     strategy:
       matrix:
-        arch: [x86_64, i686, aarch64, ppc64le, s390x]
+        arch: [x86_64, i686, aarch64, riscv64, ppc64le, s390x]
       fail-fast: false
+
     name: ${{ matrix.arch }}-linux-gnu
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Cache Precompiled OpenSSL
         id: cache-openssl
         uses: actions/cache@v3
@@ -32,10 +34,12 @@ jobs:
           key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-gnu
           path: |
             ./openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-gnu.tar.gz
+
       - name: Download Precompiled OpenSSL
         if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.arch }}-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-gnu.tar.gz"
+
       - name: Cache OTP Source Code
         id: cache-otp
         uses: actions/cache@v3
@@ -43,6 +47,7 @@ jobs:
           key: otp-${{ github.ref_name }}
           path: |
             ./otp_src_${{ github.ref_name }}.tar.gz
+
       - name: Download OTP Source Code
         if: steps.cache-otp.outputs.cache-hit != 'true'
         run: |
@@ -50,17 +55,26 @@ jobs:
           echo "OTP_VERSION: $OTP_VERSION"
           echo "github.ref_name: ${{ github.ref_name }}"
           curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
+
       - name: Pull docker image
         run: |
-          sudo docker pull quay.io/pypa/manylinux2014_${{ matrix.arch }}:latest
+          if [ "${{ matrix.arch }}" = "riscv64" ]; then
+            sudo docker pull --platform=linux/${{ matrix.arch }} riscv64/ubuntu:22.04
+          else
+            sudo docker pull quay.io/pypa/manylinux2014_${{ matrix.arch }}:latest
+          fi
+
       - name: Install binfmt
         run: |
           sudo apt install -y binfmt-support qemu-user-static
+
       - name: Compile OTP
         run: |
-          cp .github/script-to-build-manylinux2014.sh ./
+          cp .github/script-to-build-gnu.sh ./
           cp .github/do-build.sh ./
-          bash ./script-to-build-manylinux2014.sh "${{ github.ref_name }}" "${{ matrix.arch }}"
+
+          bash ./script-to-build-gnu.sh "${{ github.ref_name }}" "${{ matrix.arch }}"
+
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -75,11 +89,12 @@ jobs:
       matrix:
         arch: [x86_64, i386, aarch64, riscv64, ppc64le, s390x]
       fail-fast: false
-  
+
     name: ${{ matrix.arch }}-linux-musl
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Cache Precompiled OpenSSL
         id: cache-openssl
         uses: actions/cache@v3
@@ -87,10 +102,12 @@ jobs:
           key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl
           path: |
             ./openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl.tar.gz
+
       - name: Download Precompiled OpenSSL
         if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.arch }}-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl.tar.gz"
+
       - name: Cache OTP Source Code
         id: cache-otp
         uses: actions/cache@v3
@@ -98,6 +115,7 @@ jobs:
           key: otp-${{ github.ref_name }}
           path: |
             ./otp_src_${{ github.ref_name }}.tar.gz
+
       - name: Download OTP Source Code
         if: steps.cache-otp.outputs.cache-hit != 'true'
         run: |
@@ -105,6 +123,7 @@ jobs:
           echo "OTP_VERSION: $OTP_VERSION"
           echo "github.ref_name: ${{ github.ref_name }}"
           curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
+
       - name: Pull docker image
         run: |
           if [ "${{ matrix.arch }}" = "riscv64" ]; then
@@ -112,14 +131,18 @@ jobs:
           else
             sudo docker pull --platform=linux/${{ matrix.arch }} alpine:latest
           fi
+
       - name: Install binfmt
         run: |
           sudo apt install -y binfmt-support qemu-user-static
+
       - name: Precompile
         run: |
-          cp .github/script-to-build-alpine.sh ./
+          cp .github/script-to-build-musl.sh ./
           cp .github/do-build.sh ./
-          bash ./script-to-build-alpine.sh "${GITHUB_REF##*/v}" "${{ matrix.arch }}"
+
+          bash ./script-to-build-musl.sh "${GITHUB_REF##*/v}" "${{ matrix.arch }}"
+
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -139,15 +162,18 @@ jobs:
 
   macos:
     runs-on: macos-12
+    env:
+      OPENSSL_VERSION: "3.2.0"
     strategy:
       matrix:
         arch: [x86_64, arm64]
       fail-fast: false
-    env:
-      OPENSSL_VERSION: "3.2.0"
+
     name: ${{ matrix.arch }}-apple-darwin
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Cache Precompiled OpenSSL
         id: cache-openssl
         uses: actions/cache@v3
@@ -155,10 +181,12 @@ jobs:
           key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-apple-darwin
           path: |
             ./openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-apple-darwin.tar.gz
+
       - name: Download Precompiled OpenSSL
         if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.arch }}-apple-darwin.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-apple-darwin.tar.gz"
+
       - name: Cache OTP Source Code
         id: cache-otp
         uses: actions/cache@v3
@@ -166,6 +194,7 @@ jobs:
           key: otp-${{ github.ref_name }}
           path: |
             ./otp_src_${{ github.ref_name }}.tar.gz
+
       - name: Download OTP Source Code
         if: steps.cache-otp.outputs.cache-hit != 'true'
         run: |
@@ -173,6 +202,7 @@ jobs:
           echo "OTP_VERSION: $OTP_VERSION"
           echo "github.ref_name: ${{ github.ref_name }}"
           curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
+
       - name: Compile OTP
         run: |
           export ROOTDIR="$(pwd)"

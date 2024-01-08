@@ -32,7 +32,7 @@ Precompiled OTP for NIF library CI builds.
     <td></td>
   </tr>
   <tr>
-    <td>Linux</td>
+    <td rowspan="5">Linux</td>
     <td>x86_64-linux-gnu</td>
     <td>✓</td>
     <td>✓</td>

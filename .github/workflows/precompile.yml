@@ -344,3 +344,99 @@ jobs:
         run: |
           curl -sS --no-progress-meter "${DEPLOY_FREEBSD13_HOOK_URL}${{ github.ref_name }}"
           curl -sS --no-progress-meter "${DEPLOY_FREEBSD14_HOOK_URL}${{ github.ref_name }}"
+
+  openbsd:
+    runs-on: ubuntu-latest
+    env:
+      OPENSSL_VERSION: "3.2.0"
+    strategy:
+      matrix:
+        include:
+          - pair:
+            fullversion: "7.2"
+            major: "7"
+        # - pair:
+        #     fullversion: "7.3"
+        #     major: "7"
+        # - pair:
+        #     fullversion: "7.4"
+        #     major: "7"
+      fail-fast: false
+
+    name: x86_64-unknown-freebsd${{ matrix.pair.fullversion }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Precompiled OpenSSL
+        id: cache-openssl
+        uses: actions/cache@v3
+        with:
+          key: openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ matrix.pair.major }}
+          path: |
+            ./openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ matrix.pair.major }}.tar.gz
+
+      - name: Download Precompiled OpenSSL
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        run: |
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-unknown-openbsd${{ matrix.pair.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ matrix.pair.major }}.tar.gz"
+
+      - name: Cache OTP Source Code
+        id: cache-otp
+        uses: actions/cache@v3
+        with:
+          key: otp-${{ github.ref_name }}
+          path: |
+            ./otp_src_${{ github.ref_name }}.tar.gz
+
+      - name: Download OTP Source Code
+        if: steps.cache-otp.outputs.cache-hit != 'true'
+        run: |
+          export OTP_VERSION=${GITHUB_REF##*/v}
+          echo "OTP_VERSION: $OTP_VERSION"
+          echo "github.ref_name: ${{ github.ref_name }}"
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
+
+      - name: Compile in OpenBSD
+        id: compile-openbsd
+        uses: vmactions/openbsd-vm@v1
+        with:
+          envs: 'OPENSSL_VERSION'
+          release: ${{ matrix.pair.fullversion }}
+          usesh: true
+          prepare: |
+            pkg_add curl gmake
+
+          run: |
+            export TRIPLET=x86_64-unknown-freebsd${{ matrix.pair.major }}
+            export OTP_VERSION="${GITHUB_REF##*/v}"
+            export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}
+            export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
+            export ROOT_DIR="$(pwd)"
+
+            mkdir -p "${OPENSSL_PERFIX_DIR}"
+            tar -C "${OPENSSL_PERFIX_DIR}" -xf "${OPENSSL_ARCHIVE}"
+            tar -xzf "otp_src_${GITHUB_REF_NAME}.tar.gz"
+            cd "otp_src_${OTP_VERSION}"
+            ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
+            gmake -j$(getconf NPROCESSORS_ONLN)
+            gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
+            cd "otp_${OTP_VERSION}"
+            tar -czf "/work/otp-${TRIPLET}.tar.gz" .
+
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            otp-*.tar.gz
+
+  deploy-openbsd:
+    runs-on: ubuntu-latest
+    needs: openbsd
+    steps:
+      - name: deploy
+        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'cocoa-xu/otp-build'
+        env:
+          DEPLOY_OPENBSD7_HOOK_URL: ${{ secrets.DEPLOY_OPENBSD7_HOOK_URL }}
+        run: |
+          curl -sS --no-progress-meter "${DEPLOY_OPENBSD7_HOOK_URL}${{ github.ref_name }}"

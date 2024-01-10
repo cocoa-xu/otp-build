@@ -506,7 +506,7 @@ jobs:
           release: ${{ matrix.pair.fullversion }}
           usesh: true
           prepare: |
-            pkg_add curl gmake
+            /usr/sbin/pkg_add curl gmake
 
           run: |
             export TRIPLET=x86_64-unknown-netbsd${{ matrix.pair.major }}

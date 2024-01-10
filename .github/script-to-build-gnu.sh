@@ -10,5 +10,5 @@ if [ "${ARCH}" = "riscv64" ]; then
     IMAGE_NAME="riscv64/ubuntu:22.04"
 fi
 
-sudo docker run --privileged --network=host --rm -v `pwd`:/work "${IMAGE_NAME}" \
+sudo docker run --privileged --network=host --rm -v $(pwd):/work "${IMAGE_NAME}" \
     sh -c "chmod a+x /work/do-build.sh && /work/do-build.sh ${OTP_VERSION} ${ARCH} ${ARCH}-linux-gnu"

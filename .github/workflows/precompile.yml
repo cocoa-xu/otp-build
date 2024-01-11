@@ -410,7 +410,7 @@ jobs:
             pkg_add curl gmake
 
           run: |
-            export TRIPLET=x86_64-unknown-freebsd${{ matrix.pair.major }}
+            export TRIPLET=x86_64-unknown-openbsd${{ matrix.pair.major }}
             export OTP_VERSION="${GITHUB_REF##*/v}"
             export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}
             export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"

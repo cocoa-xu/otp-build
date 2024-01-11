@@ -312,7 +312,6 @@ jobs:
             pkg install -y perl5 gmake
 
           run: |
-            export ROOT_DIR=$(pwd)
             export TRIPLET=x86_64-unknown-freebsd${{ matrix.pair.major }}
             export OTP_VERSION="${GITHUB_REF##*/v}"
             export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}
@@ -411,7 +410,6 @@ jobs:
             pkg_add curl gmake
 
           run: |
-            export ROOT_DIR=$(pwd)
             export TRIPLET=x86_64-unknown-freebsd${{ matrix.pair.major }}
             export OTP_VERSION="${GITHUB_REF##*/v}"
             export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}
@@ -511,7 +509,6 @@ jobs:
             /usr/sbin/pkg_add curl gmake perl
 
           run: |
-            export ROOT_DIR=$(pwd)
             export TRIPLET=x86_64-unknown-netbsd${{ matrix.pair.major }}
             export OTP_VERSION="${GITHUB_REF##*/v}"
             export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}

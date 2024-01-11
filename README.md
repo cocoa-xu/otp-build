@@ -7,7 +7,7 @@ Precompiled OTP for NIF library CI builds.
 <table>
 <thead>
   <tr>
-    <th colspan="6">Availability</th>
+    <th colspan="7">Availability<br></th>
   </tr>
 </thead>
 <tbody>
@@ -15,14 +15,16 @@ Precompiled OTP for NIF library CI builds.
     <td></td>
     <td></td>
     <td><b>NIF Version →</b></td>
-    <td>2.17</td>
-    <td colspan="2">2.16</td>
+    <td colspan="2">2.17</td>
+    <td>2.16</td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td></td>
     <td><b>Erlang/OTP Version →</b></td>
     <td>26.2.1</td>
+    <td>26.2</td>
     <td>25.3.2.8</td>
     <td>24.3.4.15</td>
   </tr>
@@ -30,6 +32,7 @@ Precompiled OTP for NIF library CI builds.
     <td><b>OS ↓</b></td>
     <td><b>ABI ↓</b></td>
     <td><b>Architecture ↓</b></td>
+    <td></td>
     <td></td>
     <td></td>
     <td></td>
@@ -41,9 +44,11 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>i686</td>
+    <td>✓</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
@@ -53,9 +58,11 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>riscv64</td>
+    <td>✓</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
@@ -65,9 +72,11 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>s390x</td>
+    <td>✓</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
@@ -78,9 +87,11 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
-    <td>i386</td>
+    <td>i686</td>
+    <td>✓</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
@@ -90,9 +101,11 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>riscv64</td>
+    <td>✓</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
@@ -102,9 +115,11 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>s390x</td>
+    <td>✓</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
@@ -116,9 +131,46 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FreeBSD</td>
+    <td>13</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>NetBSD</td>
+    <td>9</td>
+    <td>x86_64</td>
+    <td>✓</td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>

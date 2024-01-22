@@ -1,0 +1,76 @@
+name: auto-update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AUTO_UPDATE_TOKEN }}
+
+      - name: Get latest version
+        id: otp-version
+        run: |
+          pip3 install -U lastversion
+          OTP26_VERSION=$(lastversion -b 26 erlang)
+          OTP25_VERSION=$(lastversion -b 25 erlang)
+          OTP24_VERSION=$(lastversion -b 24 erlang)
+
+          echo "Latest version of Erlang/OTP 26 is ${OTP26_VERSION}"
+          echo "Latest version of Erlang/OTP 25 is ${OTP25_VERSION}"
+          echo "Latest version of Erlang/OTP 24 is ${OTP24_VERSION}"
+
+          echo "tag26=v${OTP26_VERSION}" >> $GITHUB_OUTPUT
+          echo "tag25=v${OTP25_VERSION}" >> $GITHUB_OUTPUT
+          echo "tag24=v${OTP24_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Check if Erlang/OTP 26 tag exists
+        uses: mukunku/tag-exists-action@v1.5.0
+        id: check-tag-otp26
+        with: 
+          tag: ${{ steps.otp-version.outputs.tag26 }}
+          repo: 'cocoa-xu/otp-build'
+      
+      - name: Update if Erlang/OTP 26 tag not exists
+        if: steps.check-tag-otp26.outputs.exists == 'false'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ steps.otp-version.outputs.tag26 }}
+          git push origin ${{ steps.otp-version.outputs.tag26 }}
+
+      - name: Check if Erlang/OTP 25 tag exists
+        uses: mukunku/tag-exists-action@v1.5.0
+        id: check-tag-otp25
+        with: 
+          tag: ${{ steps.otp-version.outputs.tag25 }}
+          repo: 'cocoa-xu/otp-build'
+      
+      - name: Update if Erlang/OTP 25 tag not exists
+        if: steps.check-tag-otp25.outputs.exists == 'false'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ steps.otp-version.outputs.tag25 }}
+          git push origin ${{ steps.otp-version.outputs.tag25 }}
+
+      - name: Check if Erlang/OTP 24 tag exists
+        uses: mukunku/tag-exists-action@v1.5.0
+        id: check-tag-otp24
+        with: 
+          tag: ${{ steps.otp-version.outputs.tag24 }}
+          repo: 'cocoa-xu/otp-build'
+      
+      - name: Update if Erlang/OTP 24 tag not exists
+        if: steps.check-tag-otp24.outputs.exists == 'false'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ steps.otp-version.outputs.tag24 }}
+          git push origin ${{ steps.otp-version.outputs.tag24 }}

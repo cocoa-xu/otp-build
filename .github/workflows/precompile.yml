@@ -16,7 +16,7 @@ jobs:
   linux-gnu:
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.0"
+      OPENSSL_VERSION: "3.2.1"
     strategy:
       matrix:
         arch: [x86_64, i686, aarch64, riscv64, ppc64le, s390x]
@@ -85,7 +85,7 @@ jobs:
   linux-musl:
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.0"
+      OPENSSL_VERSION: "3.2.1"
     strategy:
       matrix:
         arch: [x86_64, i386, aarch64, riscv64, ppc64le, s390x]
@@ -171,7 +171,7 @@ jobs:
   macos:
     runs-on: macos-12
     env:
-      OPENSSL_VERSION: "3.2.0"
+      OPENSSL_VERSION: "3.2.1"
     strategy:
       matrix:
         arch: [x86_64, arm64]
@@ -255,7 +255,7 @@ jobs:
   freebsd:
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.0"
+      OPENSSL_VERSION: "3.2.1"
     strategy:
       matrix:
         include:
@@ -350,7 +350,7 @@ jobs:
   openbsd:
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.0"
+      OPENSSL_VERSION: "3.2.1"
     strategy:
       matrix:
         include:
@@ -446,7 +446,7 @@ jobs:
   netbsd:
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.0"
+      OPENSSL_VERSION: "3.2.1"
     strategy:
       matrix:
         include:

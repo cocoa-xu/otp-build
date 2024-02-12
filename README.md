@@ -15,9 +15,8 @@ Precompiled OTP for NIF library CI builds.
     <td></td>
     <td></td>
     <td><b>NIF Version →</b></td>
-    <td colspan="1">2.17</td>
+    <td>2.17</td>
     <td colspan="2">2.16</td>
-    <td></td>
   </tr>
   <tr>
     <td></td>

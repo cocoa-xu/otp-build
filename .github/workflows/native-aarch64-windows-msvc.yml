@@ -1,0 +1,172 @@
+name: native-aarch64-windows-msvc
+
+on:
+  workflow_dispatch:
+    inputs:
+      otp_version:
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  native-compile:
+    runs-on: self-hosted-aarch64-windows-msvc
+    env:
+      WSL_UBUNTU_VERSION: "20.04"
+      WSL_UBUNTU_URL: "https://aka.ms/wslubuntu2004"
+      LLVM_MINGW_VERSION: "20231128"
+      NSIS_VERSION: "3.09"
+      OPENSSL_VERSION: "3.2.1"
+    steps:
+      - name: Enable WSL and Virtual Machine Platform
+        run: |
+          dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+          dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+      # - name: Fetch WSL Ubuntu ETag
+      #   id: wsl-ubuntu-etag
+      #   shell: bash
+      #   run: |
+      #     WSL_UBUNTU_ETAG="$(curl -I -fsSL -H 'If-None-Match: 123456789' ${WSL_UBUNTU_URL} | grep ETag | awk '{print $2}')"
+      #     echo "etag=etag${WSL_UBUNTU_ETAG}" >> $GITHUB_OUTPUT
+
+      - name: Cache WSL Ubuntu
+        id: cache-wsl-ubuntu
+        uses: actions/cache@v4
+        with:
+          # key: wsl-ubuntu-${{ env.WSL_UBUNTU_VERSION }}-${{ steps.wsl-ubuntu-etag.outputs.etag }}
+          key: wsl-ubuntu-${{ env.WSL_UBUNTU_VERSION }}
+          path: |
+            ./Ubuntu-${{ env.WSL_UBUNTU_VERSION }}.zip
+
+      - name: Download WSL Ubuntu
+        if: steps.cache-wsl-ubuntu.outputs.cache-hit != 'true'
+        run: |
+          if (!(Test-Path "ubuntu-${{ env.WSL_UBUNTU_VERSION }}.zip" -PathType Leaf)) {
+            Invoke-WebRequest -Uri "${WSL_UBUNTU_URL}" -OutFile "ubuntu-${{ env.WSL_UBUNTU_VERSION }}.zip"
+          }
+
+      - name: Install WSL Ubuntu
+        run: |
+          Remove-Item -LiteralPath "ubuntu" -Force -Recurse -ErrorAction SilentlyContinue
+          if (!(Test-Path "ubuntu-2004-ARM64.zip" -PathType Leaf)) {
+            Expand-Archive "ubuntu-${{ env.WSL_UBUNTU_VERSION }}.zip" -DestinationPath . -Force
+            Rename-Item (Get-ChildItem ./Ubuntu*ARM64.appx).FullName Ubuntu-2004-ARM64.zip
+          }
+          New-Item -ItemType Directory -Path ubuntu -Force
+          Expand-Archive "ubuntu-2004-ARM64.zip" -DestinationPath ./ubuntu -Force
+          .\ubuntu\ubuntu.exe install --root
+          .\ubuntu\ubuntu.exe config --default-user root
+          .\ubuntu\ubuntu.exe run apt-get update
+          .\ubuntu\ubuntu.exe run apt-get install -y automake make xz-utils pkg-config unzip
+          .\ubuntu\ubuntu.exe run rm -f /usr/bin/link
+
+      - name: Cache LLVM MinGW
+        id: cache-llvm-mingw
+        uses: actions/cache@v4
+        with:
+          key: llvm-mingw-${{ env.LLVM_MINGW_VERSION }}
+          path: |
+            ./llvm-mingw-${{ env.LLVM_MINGW_VERSION }}-ucrt-ubuntu-20.04-aarch64.tar.xz
+
+      - name: Download LLVM MinGW
+        if: steps.cache-llvm-mingw.outputs.cache-hit != 'true'
+        run: |
+          $TARBALL_NAME="llvm-mingw-${{ env.LLVM_MINGW_VERSION }}-ucrt-ubuntu-20.04-aarch64.tar.xz"
+          if (!(Test-Path $TARBALL_NAME -PathType Leaf)) {
+            Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/${{ env.LLVM_MINGW_VERSION }}/${TARBALL_NAME}" -OutFile "${TARBALL_NAME}"
+          }
+
+      - name: Unarchive LLVM MinGW
+        run: |
+          $TARBALL_NAME="llvm-mingw-${{ env.LLVM_MINGW_VERSION }}-ucrt-ubuntu-20.04-aarch64.tar.xz"
+          .\ubuntu\ubuntu.exe run rm -rf /mnt/c/llvm
+          .\ubuntu\ubuntu.exe run mkdir -p /mnt/c/llvm
+          .\ubuntu\ubuntu.exe run tar -xf "${TARBALL_NAME}" -C /mnt/c/llvm
+
+      - name: Cache Nullsoft NSIS Installer
+        id: cache-nsis
+        uses: actions/cache@v4
+        with:
+          key: nsis-${{ env.NSIS_VERSION }}
+          path: |
+            ./nsis-${{ env.NSIS_VERSION }}.zip
+
+      - name: Download Nullsoft NSIS Installer
+        if: steps.cache-nsis.outputs.cache-hit != 'true'
+        run: |
+          $NSIS_ZIP_FILE="nsis-${{ env.NSIS_VERSION }}.zip"
+          if (!(Test-Path $NSIS_ZIP_FILE -PathType Leaf)) {
+            .\ubuntu\ubuntu.exe run curl -fSL "https://sourceforge.net/projects/nsis/files/NSIS%203/${{ env.NSIS_VERSION }}/nsis-${{ env.NSIS_VERSION }}.zip/download" -o "${NSIS_ZIP_FILE}"
+          }
+
+      - name: Install Nullsoft NSIS Installer
+        run: |
+          .\ubuntu\ubuntu.exe run rm -rf /mnt/c/nsis-${{ env.NSIS_VERSION }}
+          .\ubuntu\ubuntu.exe run rm -rf /mnt/c/nsis
+          .\ubuntu\ubuntu.exe run unzip -d /mnt/c/ nsis-${{ env.NSIS_VERSION }}.zip
+          .\ubuntu\ubuntu.exe run mv /mnt/c/nsis-${{ env.NSIS_VERSION }} /mnt/c/nsis
+
+      - name: Cache Precompiled Static OpenSSL
+        id: cache-static-openssl
+        uses: actions/cache@v4
+        with:
+          key: static-openssl-${{ env.LLVM_MINGW_VERSION }}
+          path: |
+            ./openssl-static-aarch64-windows-msvc.tar.gz
+
+      - name: Download Precompiled Static OpenSSL
+        if: steps.cache-static-openssl.outputs.cache-hit != 'true'
+        run: |
+          $TARBALL_NAME="openssl-static-aarch64-windows-msvc.tar.gz"
+          if (!(Test-Path $TARBALL_NAME -PathType Leaf)) {
+            .\ubuntu\ubuntu.exe run curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ env.OPENSSL_VERSION }}/${TARBALL_NAME}" -o "${TARBALL_NAME}"
+          }
+
+      - name: Setup Static OpenSSL
+        run: |
+          $Env:Path = $Env:Path + ";" + (get-location) + "\ubuntu"
+          ubuntu.exe run rm -rf /mnt/c/OpenSSL-Win64
+          ubuntu.exe run mkdir -p /mnt/c/OpenSSL-Win64
+          ubuntu.exe run tar -xf openssl-static-aarch64-windows-msvc.tar.gz -C /mnt/c/OpenSSL-Win64
+          ubuntu.exe run mkdir -p /mnt/c/OpenSSL-Win64/lib/VC/static
+          ubuntu.exe run mv /mnt/c/OpenSSL-Win64/lib/libcrypto.lib /mnt/c/OpenSSL-Win64/lib/VC/static/libcrypto64MD.lib
+          ubuntu.exe run mv /mnt/c/OpenSSL-Win64/lib/libssl.lib /mnt/c/OpenSSL-Win64/lib/VC/static/libssl64MD.lib
+
+      - name: Download OTP Source Code
+        run: |
+          .\ubuntu\ubuntu.exe run apt-get install -y git
+          .\ubuntu\ubuntu.exe run rm -rf /mnt/c/src
+          .\ubuntu\ubuntu.exe run git clone -b cx/windows-arm64 --depth=1 https://github.com/cocoa-xu/otp.git /mnt/c/src
+
+      - name: Prepare Compile Script
+        run: |
+          .\ubuntu\ubuntu.exe run rm -rf /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'export ERL_TOP=/mnt/c/src' '>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'export PATH=/mnt/c/llvm/bin:/mnt/c/nsis/Bin:\${PATH}' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'eval \`./otp_build env_win32 arm64\`' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo './otp_build configure' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo './otp_build boot -a' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo './otp_build release -a \$ERL_TOP/release/aarch64-windows-msvc' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo './otp_build installer_win32 \$ERL_TOP/release/aarch64-windows-msvc' '>>' /mnt/c/src/compile-in-wsl.sh
+
+      - name: Compile
+        run: |
+          $dest = (get-location).Path
+          $Env:Path = $Env:Path + ";" + (get-location) + "\ubuntu"
+          cd C:\src
+          ubuntu.exe run chmod a+x /mnt/c/src/compile-in-wsl.sh
+          ubuntu.exe run ./compile-in-wsl.sh
+          Copy-Item C:\src\release\aarch64-windows-msvc\otp_win32_27.0-rc1.exe $dest
+
+      - uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ inputs.otp_version }}
+          tag_name: ${{ inputs.otp_version }}
+          files: |
+            otp_*.exe

@@ -22,6 +22,7 @@ jobs:
       LLVM_MINGW_VERSION: "20231128"
       MS_OPENJDK_VERSION: "16.0.2.7.1"
       MS_OPENJDK_TAG: "jdk-16.0.2-ga"
+      MS_OPENJDK_VERSION_PATH: "16.0.2.7-hotspot"
       NSIS_VERSION: "3.09"
       OPENSSL_VERSION: "3.2.1"
     steps:
@@ -174,6 +175,7 @@ jobs:
           .\ubuntu\ubuntu.exe run echo 'export ERL_TOP=/mnt/c/src' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'eval \`./otp_build env_win32 x64_arm64\`' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'export PATH=/mnt/c/llvm/bin:/mnt/c/nsis/Bin:\${PATH}' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'export PATH="/mnt/c/Program Files (Arm)/Microsoft/Java/jdk-${{ env.MS_OPENJDK_VERSION_PATH }}/bin":\${PATH}`' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build configure' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build boot -a' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build release -a \$ERL_TOP/release/aarch64-windows-msvc' '>>' /mnt/c/src/compile-in-wsl.sh

@@ -20,6 +20,8 @@ jobs:
       WSL_UBUNTU_VERSION: "20.04"
       WSL_UBUNTU_URL: "https://aka.ms/wslubuntu2004"
       LLVM_MINGW_VERSION: "20231128"
+      MS_OPENJDK_VERSION: "16.0.2.7.1"
+      MS_OPENJDK_TAG: "jdk-16.0.2-ga"
       NSIS_VERSION: "3.09"
       OPENSSL_VERSION: "3.2.1"
     steps:
@@ -89,6 +91,27 @@ jobs:
           .\ubuntu\ubuntu.exe run mkdir -p /mnt/c/llvm
           .\ubuntu\ubuntu.exe run tar -xf "${TARBALL_NAME}" -C /mnt/c/llvm --strip-components=1
 
+      - name: Cache Microsoft OpenJDK
+        id: cache-microsoft-openjdk
+        uses: actions/cache@v4
+        with:
+          key: microsoft-openjdk-${{ env.MS_OPENJDK_VERSION }}
+          path: |
+            ./microsoft-jdk-${{ env.MS_OPENJDK_VERSION }}-windows-aarch64.msi
+
+      - name: Download Microsoft OpenJDK
+        if: steps.cache-llvm-mingw.outputs.cache-hit != 'true'
+        run: |
+          $MSI_FILENAME="microsoft-jdk-${{ env.MS_OPENJDK_VERSION }}-windows-aarch64.msi"
+          if (!(Test-Path $TARBALL_NAME -PathType Leaf)) {
+            Invoke-WebRequest -Uri "https://github.com/microsoft/openjdk-aarch64/releases/download/${{ env.MS_OPENJDK_TAG }}/${MSI_FILENAME}" -OutFile "${MSI_FILENAME}"
+          }
+
+      - name: Install Microsoft OpenJDK
+        run: |
+          $MSI_FILENAME="microsoft-jdk-${{ env.MS_OPENJDK_VERSION }}-windows-aarch64.msi"
+          powershell.exe -command "${MSI_FILENAME} /quiet /passive"
+
       - name: Cache Nullsoft NSIS Installer
         id: cache-nsis
         uses: actions/cache@v4
@@ -147,9 +170,8 @@ jobs:
       - name: Prepare Compile Script
         run: |
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/src/compile-in-wsl.sh
-          .\ubuntu\ubuntu.exe run echo '#!/bin/bash' '>' /mnt/c/src/compile-in-wsl.sh
-          .\ubuntu\ubuntu.exe run echo 'set -euo' '>' /mnt/c/src/compile-in-wsl.sh
-          .\ubuntu\ubuntu.exe run echo 'export ERL_TOP=/mnt/c/src' '>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'set -x' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'export ERL_TOP=/mnt/c/src' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'eval \`./otp_build env_win32 x64_arm64\`' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'export PATH=/mnt/c/llvm/bin:/mnt/c/nsis/Bin:\${PATH}' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build configure' '>>' /mnt/c/src/compile-in-wsl.sh

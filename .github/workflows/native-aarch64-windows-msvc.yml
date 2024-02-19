@@ -87,7 +87,7 @@ jobs:
           $TARBALL_NAME="llvm-mingw-${{ env.LLVM_MINGW_VERSION }}-ucrt-ubuntu-20.04-aarch64.tar.xz"
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/llvm
           .\ubuntu\ubuntu.exe run mkdir -p /mnt/c/llvm
-          .\ubuntu\ubuntu.exe run tar -xf "${TARBALL_NAME}" -C /mnt/c/llvm
+          .\ubuntu\ubuntu.exe run tar -xf "${TARBALL_NAME}" -C /mnt/c/llvm --strip-components=1
 
       - name: Cache Nullsoft NSIS Installer
         id: cache-nsis
@@ -102,7 +102,7 @@ jobs:
         run: |
           $NSIS_ZIP_FILE="nsis-${{ env.NSIS_VERSION }}.zip"
           if (!(Test-Path $NSIS_ZIP_FILE -PathType Leaf)) {
-            .\ubuntu\ubuntu.exe run curl -fSL "https://sourceforge.net/projects/nsis/files/NSIS%203/${{ env.NSIS_VERSION }}/nsis-${{ env.NSIS_VERSION }}.zip/download" -o "${NSIS_ZIP_FILE}"
+            .\ubuntu\ubuntu.exe run curl -fSL "https://sourceforge.net/projects/nsis/files/NSIS%203/${{ env.NSIS_VERSION }}/${NSIS_ZIP_FILE}/download" -o "${NSIS_ZIP_FILE}"
           }
 
       - name: Install Nullsoft NSIS Installer
@@ -147,9 +147,11 @@ jobs:
       - name: Prepare Compile Script
         run: |
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo '#!/bin/bash' '>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'set -euo' '>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'export ERL_TOP=/mnt/c/src' '>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'eval \`./otp_build env_win32 x64_arm64\`' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'export PATH=/mnt/c/llvm/bin:/mnt/c/nsis/Bin:\${PATH}' '>>' /mnt/c/src/compile-in-wsl.sh
-          .\ubuntu\ubuntu.exe run echo 'eval \`./otp_build env_win32 arm64\`' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build configure' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build boot -a' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build release -a \$ERL_TOP/release/aarch64-windows-msvc' '>>' /mnt/c/src/compile-in-wsl.sh
@@ -161,7 +163,7 @@ jobs:
           $Env:Path = $Env:Path + ";" + (get-location) + "\ubuntu"
           cd C:\src
           ubuntu.exe run chmod a+x /mnt/c/src/compile-in-wsl.sh
-          ubuntu.exe run ./compile-in-wsl.sh
+          cd
           Copy-Item C:\src\release\aarch64-windows-msvc\otp_win32_27.0-rc1.exe $dest
 
       - uses: softprops/action-gh-release@v1

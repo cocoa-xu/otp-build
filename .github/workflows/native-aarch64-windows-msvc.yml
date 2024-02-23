@@ -119,22 +119,22 @@ jobs:
         with:
           key: nsis-${{ env.NSIS_VERSION }}
           path: |
-            ./nsis-${{ env.NSIS_VERSION }}.zip
+            ./nsis-${{ env.NSIS_VERSION }}-aarch64-windows-msvc.tar.gz
 
       - name: Download Nullsoft NSIS Installer
         if: steps.cache-nsis.outputs.cache-hit != 'true'
         run: |
-          $NSIS_ZIP_FILE="nsis-${{ env.NSIS_VERSION }}.zip"
+          $NSIS_ZIP_FILE="nsis-${{ env.NSIS_VERSION }}-aarch64-windows-msvc.tar.gz"
           if (!(Test-Path $NSIS_ZIP_FILE -PathType Leaf)) {
-            .\ubuntu\ubuntu.exe run curl -fSL "https://sourceforge.net/projects/nsis/files/NSIS%203/${{ env.NSIS_VERSION }}/${NSIS_ZIP_FILE}/download" -o "${NSIS_ZIP_FILE}"
+            .\ubuntu\ubuntu.exe run curl -fSL "https://github.com/cocoa-xu/nsis-windows-build/releases/download/v${{ env.NSIS_VERSION }}/nsis-aarch64-windows-msvc.tar.gz" -o "${NSIS_ZIP_FILE}"
           }
 
       - name: Install Nullsoft NSIS Installer
         run: |
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/nsis-${{ env.NSIS_VERSION }}
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/nsis
-          .\ubuntu\ubuntu.exe run unzip -d /mnt/c/ nsis-${{ env.NSIS_VERSION }}.zip
-          .\ubuntu\ubuntu.exe run mv /mnt/c/nsis-${{ env.NSIS_VERSION }} /mnt/c/nsis
+          .\ubuntu\ubuntu.exe run mkdir -p /mnt/c/nsis
+          .\ubuntu\ubuntu.exe run tar -xf nsis-${{ env.NSIS_VERSION }}-aarch64-windows-msvc.tar.gz -C /mnt/c/nsis
 
       - name: Cache Precompiled Static OpenSSL
         id: cache-static-openssl
@@ -171,9 +171,8 @@ jobs:
       - name: Prepare Compile Script
         run: |
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/src/compile-in-wsl.sh
-          .\ubuntu\ubuntu.exe run echo 'set -x' '>>' /mnt/c/src/compile-in-wsl.sh
-          .\ubuntu\ubuntu.exe run echo 'export ERL_TOP=/mnt/c/src' '>>' /mnt/c/src/compile-in-wsl.sh
-          .\ubuntu\ubuntu.exe run echo 'eval \`./otp_build env_win32 x64_arm64\`' '>>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'export ERL_TOP=/mnt/c/src' '>' /mnt/c/src/compile-in-wsl.sh
+          .\ubuntu\ubuntu.exe run echo 'eval \`./otp_build env_win32 arm64\`' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'export PATH=/mnt/c/llvm/bin:/mnt/c/nsis/Bin:\${PATH}' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo 'export PATH="/mnt/c/Program Files (Arm)/Microsoft/Java/jdk-${{ env.MS_OPENJDK_VERSION_PATH }}/bin":\${PATH}`' '>>' /mnt/c/src/compile-in-wsl.sh
           .\ubuntu\ubuntu.exe run echo './otp_build configure' '>>' /mnt/c/src/compile-in-wsl.sh
@@ -187,6 +186,7 @@ jobs:
           $Env:Path = $Env:Path + ";" + (get-location) + "\ubuntu"
           cd C:\src
           ubuntu.exe run chmod a+x /mnt/c/src/compile-in-wsl.sh
+          ubuntu.exe run ./compile-in-wsl.sh
           cd
           Copy-Item C:\src\release\aarch64-windows-msvc\otp_win32_27.0-rc1.exe $dest
 

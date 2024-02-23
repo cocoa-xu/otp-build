@@ -119,22 +119,22 @@ jobs:
         with:
           key: nsis-${{ env.NSIS_VERSION }}
           path: |
-            ./nsis-${{ env.NSIS_VERSION }}-aarch64-windows-msvc.tar.gz
+            ./nsis-${{ env.NSIS_VERSION }}.zip
 
       - name: Download Nullsoft NSIS Installer
         if: steps.cache-nsis.outputs.cache-hit != 'true'
         run: |
-          $NSIS_ZIP_FILE="nsis-${{ env.NSIS_VERSION }}-aarch64-windows-msvc.tar.gz"
+          $NSIS_ZIP_FILE="nsis-${{ env.NSIS_VERSION }}.zip"
           if (!(Test-Path $NSIS_ZIP_FILE -PathType Leaf)) {
-            .\ubuntu\ubuntu.exe run curl -fSL "https://github.com/cocoa-xu/nsis-windows-build/releases/download/v${{ env.NSIS_VERSION }}/nsis-aarch64-windows-msvc.tar.gz" -o "${NSIS_ZIP_FILE}"
+            .\ubuntu\ubuntu.exe run curl -fSL "https://sourceforge.net/projects/nsis/files/NSIS%203/${{ env.NSIS_VERSION }}/${NSIS_ZIP_FILE}/download" -o "${NSIS_ZIP_FILE}"
           }
 
       - name: Install Nullsoft NSIS Installer
         run: |
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/nsis-${{ env.NSIS_VERSION }}
           .\ubuntu\ubuntu.exe run rm -rf /mnt/c/nsis
-          .\ubuntu\ubuntu.exe run mkdir -p /mnt/c/nsis
-          .\ubuntu\ubuntu.exe run tar -xf nsis-${{ env.NSIS_VERSION }}-aarch64-windows-msvc.tar.gz -C /mnt/c/nsis
+          .\ubuntu\ubuntu.exe run unzip -d /mnt/c/ nsis-${{ env.NSIS_VERSION }}.zip
+          .\ubuntu\ubuntu.exe run mv /mnt/c/nsis-${{ env.NSIS_VERSION }} /mnt/c/nsis
 
       - name: Cache Precompiled Static OpenSSL
         id: cache-static-openssl

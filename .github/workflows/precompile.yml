@@ -357,7 +357,7 @@ jobs:
         #     fullversion: "7.4"
         #     major: "7"
 
-    name: x86_64-unknown-openbsd${{ env.OPENBSD_FULLVERSION }}
+    name: x86_64-unknown-openbsd7
 
     steps:
       - uses: actions/checkout@v4

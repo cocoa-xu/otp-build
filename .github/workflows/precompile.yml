@@ -351,21 +351,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OPENSSL_VERSION: "3.2.1"
-    strategy:
-      matrix:
-        include:
-          - pair:
-              fullversion: "7.2"
-              major: "7"
-        # - pair:
-        #     fullversion: "7.3"
-        #     major: "7"
+      OPENBSD_FULLVERSION: "7.3"
+      OPENBSD_MAJOR_VERSION: "7"
         # - pair:
         #     fullversion: "7.4"
         #     major: "7"
-      fail-fast: false
 
-    name: x86_64-unknown-openbsd${{ matrix.pair.fullversion }}
+    name: x86_64-unknown-openbsd${{ env.OPENBSD_FULLVERSION }}
 
     steps:
       - uses: actions/checkout@v4
@@ -374,14 +366,14 @@ jobs:
         id: cache-openssl
         uses: actions/cache@v3
         with:
-          key: openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ matrix.pair.major }}
+          key: openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}
           path: |
-            ./openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ matrix.pair.major }}.tar.gz
+            ./openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}.tar.gz
 
       - name: Download Precompiled OpenSSL
         if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-unknown-openbsd${{ matrix.pair.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ matrix.pair.major }}.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}.tar.gz"
 
       - name: Cache OTP Source Code
         id: cache-otp
@@ -404,13 +396,13 @@ jobs:
         uses: vmactions/openbsd-vm@v1
         with:
           envs: 'OPENSSL_VERSION'
-          release: ${{ matrix.pair.fullversion }}
+          release: ${{ env.OPENBSD_FULLVERSION }}
           usesh: true
           prepare: |
             pkg_add curl gmake
 
           run: |
-            export TRIPLET=x86_64-unknown-openbsd${{ matrix.pair.major }}
+            export TRIPLET=x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}
             export OTP_VERSION="${GITHUB_REF##*/v}"
             export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}
             export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"

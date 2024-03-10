@@ -22,9 +22,9 @@ Precompiled OTP for NIF library CI builds.
     <td></td>
     <td></td>
     <td><b>Erlang/OTP Version →</b></td>
-    <td>26.2-26.2.3</td>
-    <td>25.3.2.8-25.3.2.9</td>
-    <td>24.3.4.15-24.3.4.16</td>
+    <td>26.0-26.2.3</td>
+    <td>25.3.2.7-25.3.2.9</td>
+    <td>24.3.4.13-24.3.4.16</td>
   </tr>
   <tr>
     <td><b>OS ↓</b></td>

@@ -32,7 +32,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: startsWith(github.ref, 'refs/tags/v24')
         id: cache-openssl-otp24
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-gnu
           path: |
@@ -46,7 +46,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-gnu
           path: |
@@ -59,7 +59,7 @@ jobs:
 
       - name: Cache OTP Source Code
         id: cache-otp
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: otp-${{ github.ref_name }}
           path: |
@@ -125,7 +125,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: startsWith(github.ref, 'refs/tags/v24')
         id: cache-openssl-otp24
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-musl
           path: |
@@ -139,7 +139,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl
           path: |
@@ -152,7 +152,7 @@ jobs:
 
       - name: Cache OTP Source Code
         id: cache-otp
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: otp-${{ github.ref_name }}
           path: |
@@ -239,7 +239,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: startsWith(github.ref, 'refs/tags/v24')
         id: cache-openssl-otp24
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-apple-darwin
           path: |
@@ -253,7 +253,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-apple-darwin
           path: |
@@ -266,7 +266,7 @@ jobs:
 
       - name: Cache OTP Source Code
         id: cache-otp
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: otp-${{ github.ref_name }}
           path: |
@@ -356,7 +356,7 @@ jobs:
       - name: Cache Precompiled OpenSSLfor OTP 24 and below
         if: startsWith(github.ref, 'refs/tags/v24')
         id: cache-openssl-otp24
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-freebsd${{ matrix.pair.major }}
           path: |
@@ -370,7 +370,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-freebsd${{ matrix.pair.major }}
           path: |
@@ -383,7 +383,7 @@ jobs:
 
       - name: Cache OTP Source Code
         id: cache-otp
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: otp-${{ github.ref_name }}
           path: |
@@ -472,7 +472,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: startsWith(github.ref, 'refs/tags/v24')
         id: cache-openssl-otp24
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}
           path: |
@@ -486,7 +486,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}
           path: |
@@ -499,7 +499,7 @@ jobs:
 
       - name: Cache OTP Source Code
         id: cache-otp
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: otp-${{ github.ref_name }}
           path: |
@@ -597,7 +597,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: startsWith(github.ref, 'refs/tags/v24')
         id: cache-openssl-otp24
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-netbsd${{ matrix.pair.major }}
           path: |
@@ -611,7 +611,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-netbsd${{ matrix.pair.major }}
           path: |
@@ -624,7 +624,7 @@ jobs:
 
       - name: Cache OTP Source Code
         id: cache-otp
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: otp-${{ github.ref_name }}
           path: |

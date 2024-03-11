@@ -29,7 +29,7 @@ esac
 
 cd /work && \
     mkdir -p "${OPENSSL_PERFIX_DIR}" && \
-    tar -C "${OPENSSL_PERFIX_DIR}" -xf "${OPENSSL_ARCHIVE}" && \
+    tar -C "${OPENSSL_PERFIX_DIR}" -xzf "${OPENSSL_ARCHIVE}" && \
     tar -xzf "otp_src_${GITHUB_REF_NAME}.tar.gz" && \
     cd "otp_src_${OTP_VERSION}" && \
     ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib && \

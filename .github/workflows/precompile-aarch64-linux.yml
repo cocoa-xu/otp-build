@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24')
+        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
@@ -36,12 +36,12 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-gnu.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
+        if: (startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-aarch64-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-gnu.tar.gz"
 
       - name: Cache Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true'
+        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -50,7 +50,7 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-gnu.tar.gz
 
       - name: Download Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
+        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-aarch64-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-gnu.tar.gz"
 
@@ -85,7 +85,7 @@ jobs:
           cp .github/do-build.sh ./
 
           case "${{ github.ref_name }}" in
-            v24.*)
+            v24.* | v23.*)
               bash ./script-to-build-gnu.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "aarch64"
               ;;
             *)
@@ -113,7 +113,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24')
+        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
@@ -122,12 +122,12 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-musl.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
+        if: (startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-aarch64-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-musl.tar.gz"
 
       - name: Cache Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true'
+        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -136,7 +136,7 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-musl.tar.gz
 
       - name: Download Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
+        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-aarch64-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-musl.tar.gz"
 
@@ -171,7 +171,7 @@ jobs:
           cp .github/do-build.sh ./
 
           case "${{ github.ref_name }}" in
-            v24.*)
+            v24.* | v23.*)
               bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "aarch64" "alpine:latest"
               ;;
             *)
@@ -190,7 +190,6 @@ jobs:
     runs-on: self-hosted-aarch64-linux
     env:
       OPENSSL_VERSION: "3.2.1"
-      OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
 
     name: aarch64-linux-gnu
 
@@ -198,22 +197,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24')
-        id: cache-openssl-otp24
-        uses: actions/cache@v4
-        with:
-          key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-gnu
-          path: |
-            ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-gnu.tar.gz
-
-      - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
-        run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-aarch64-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-gnu.tar.gz"
-
       - name: Cache Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -222,7 +206,7 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-gnu.tar.gz
 
       - name: Download Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-aarch64-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-gnu.tar.gz"
 
@@ -251,14 +235,7 @@ jobs:
           cp .github/script-to-build-gnu.sh ./
           cp .github/do-build.sh ./
 
-          case "${{ github.ref_name }}" in
-            v24.*)
-              bash ./script-to-build-gnu.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "aarch64"
-              ;;
-            *)
-              bash ./script-to-build-gnu.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "aarch64"
-              ;;
-          esac
+          bash ./script-to-build-gnu.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "aarch64"
 
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
@@ -276,7 +253,6 @@ jobs:
     runs-on: self-hosted-aarch64-linux
     env:
       OPENSSL_VERSION: "3.2.1"
-      OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
 
     name: aarch64-linux-musl
 
@@ -284,22 +260,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24')
-        id: cache-openssl-otp24
-        uses: actions/cache@v4
-        with:
-          key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-musl
-          path: |
-            ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-musl.tar.gz
-
-      - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
-        run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-aarch64-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-aarch64-linux-musl.tar.gz"
-
       - name: Cache Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true'
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -308,7 +269,7 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-musl.tar.gz
 
       - name: Download Precompiled OpenSSL
-        if: startsWith(github.ref, 'refs/tags/v24') != 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-aarch64-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-aarch64-linux-musl.tar.gz"
 
@@ -337,14 +298,7 @@ jobs:
           cp .github/script-to-build-musl.sh ./
           cp .github/do-build.sh ./
 
-          case "${{ github.ref_name }}" in
-            v24.*)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "aarch64" "alpine:latest"
-              ;;
-            *)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "aarch64" "alpine:latest"
-              ;;
-          esac
+          bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "aarch64" "alpine:latest"
 
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')

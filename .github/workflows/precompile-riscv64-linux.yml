@@ -1,4 +1,4 @@
-name: precompile-linux-musl
+name: precompile-riscv64-linux
 
 on:
   push:
@@ -13,17 +13,13 @@ permissions:
   contents: write
 
 jobs:
-  linux-musl:
+  riscv64-linux-gnu:
     runs-on: ubuntu-latest
     env:
       OPENSSL_VERSION: "3.2.1"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
-    strategy:
-      matrix:
-        arch: [x86_64, i386, ppc64le, s390x]
-      fail-fast: false
 
-    name: ${{ matrix.arch }}-linux-musl
+    name: riscv64-linux-gnu
 
     steps:
       - name: Checkout
@@ -34,28 +30,28 @@ jobs:
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
-          key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-musl
+          key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-riscv64-linux-gnu
           path: |
-            ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-musl.tar.gz
+            ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-riscv64-linux-gnu.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 24 and below
         if: (startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-${{ matrix.arch }}-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-musl.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-riscv64-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-riscv64-linux-gnu.tar.gz"
 
       - name: Cache Precompiled OpenSSL
         if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
-          key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl
+          key: openssl-${{ env.OPENSSL_VERSION }}-riscv64-linux-gnu
           path: |
-            ./openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl.tar.gz
+            ./openssl-${{ env.OPENSSL_VERSION }}-riscv64-linux-gnu.tar.gz
 
       - name: Download Precompiled OpenSSL
         if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.arch }}-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-riscv64-linux-gnu.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-riscv64-linux-gnu.tar.gz"
 
       - name: Cache OTP Source Code
         id: cache-otp
@@ -75,24 +71,24 @@ jobs:
 
       - name: Pull docker image
         run: |
-          sudo docker pull --platform=linux/${{ matrix.arch }} alpine:latest
+          sudo docker pull --platform=linux/riscv64 riscv64/ubuntu:22.04
 
       - name: Install binfmt
         run: |
           sudo apt update
           sudo apt install -y binfmt-support qemu-user-static
 
-      - name: Precompile
+      - name: Compile OTP
         run: |
-          cp .github/script-to-build-musl.sh ./
+          cp .github/script-to-build-gnu.sh ./
           cp .github/do-build.sh ./
 
           case "${{ github.ref_name }}" in
-            v24.* | v23.*)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "${{ matrix.arch }}" "alpine:latest"
+            v24.* | v23.* )
+              bash ./script-to-build-gnu.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "riscv64"
               ;;
             *)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "${{ matrix.arch }}" "alpine:edge"
+              bash ./script-to-build-gnu.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "riscv64"
               ;;
           esac
 
@@ -102,13 +98,13 @@ jobs:
           files: |
             otp-*.tar.gz
 
-  deploy-linux-musl:
+  deploy-riscv64-linux-gnu:
     runs-on: ubuntu-latest
-    needs: linux-musl
+    needs: riscv64-linux-gnu
     steps:
       - name: deploy
         if: startsWith(github.ref, 'refs/tags/') && github.repository == 'cocoa-xu/otp-build'
         env:
-          DEPLOY_LINUX_MUSL_HOOK_URL: ${{ secrets.DEPLOY_LINUX_MUSL_HOOK_URL }}
+          DEPLOY_RISCV64_LINUX_GNU_HOOK_URL: ${{ secrets.DEPLOY_RISCV64_LINUX_GNU_HOOK_URL }}
         run: |
-          curl -sS --no-progress-meter "${DEPLOY_LINUX_MUSL_HOOK_URL}${{ github.ref_name }}"
+          curl -sS --no-progress-meter "${DEPLOY_RISCV64_LINUX_GNU_HOOK_URL}${{ github.ref_name }}"

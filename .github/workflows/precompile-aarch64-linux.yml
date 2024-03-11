@@ -339,10 +339,10 @@ jobs:
 
           case "${{ github.ref_name }}" in
             v24.*)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "aarch64"
+              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "aarch64" "alpine:latest"
               ;;
             *)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "aarch64"
+              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "aarch64" "alpine:latest"
               ;;
           esac
 

@@ -110,6 +110,9 @@ jobs:
             cd "otp_${OTP_VERSION}"
             tar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
 
+            cd "${ROOT_DIR}"
+            rm -rf "otp_src_${OTP_VERSION}" "otp_${OTP_VERSION}" "${OPENSSL_PERFIX_DIR}"
+
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:

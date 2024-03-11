@@ -159,6 +159,8 @@ Precompiled OTP for NIF library CI builds.
 
 ## Example
 
+### Without Action Cache
+
 ```yaml
 name: ci
 
@@ -176,14 +178,78 @@ jobs:
   mix_test:
     runs-on: macos-11
     env:
-      OTP_VERSION: "26.2.1"
-      ELIXIR_VERSION: "1.15.7"
+      OTP_VERSION: "26.2.3"
+      ELIXIR_VERSION: "1.16.2"
 
     steps:
       # this will clone and setup your repo
       - uses: actions/checkout@v4
 
-      # cache precompiled Erlang/OTP for speedup
+      # Download precompiled Erlang/OTP
+      - name: Download Erlang/OTP
+        run: |
+          # set the triplet for your platform
+          TRIPLET=x86_64-apple-darwin
+
+          mkdir -p ./cache/otp
+          curl -fSL https://github.com/cocoa-xu/otp-build/releases/download/v${{ env.OTP_VERSION }}/otp-${TRIPLET}.tar.gz -o ./cache/otp/otp-v${{ env.OTP_VERSION }}-${TRIPLET}.tar.gz
+          cd ./cache/otp
+          tar -xzf otp-v${{ env.OTP_VERSION }}-${TRIPLET}.tar.gz
+
+      # Download and Compile Elixir (optional)
+      - name: Download and Compile Elixir
+        run: |
+          export PATH=$(pwd)/./cache/otp/usr/local/bin:$(pwd)/./cache/elixir/elixir-${{ env.ELIXIR_VERSION }}/bin:${PATH}
+          export ERL_ROOTDIR=$(pwd)/./cache/otp/usr/local/lib/erlang
+
+          mkdir -p ./cache/elixir
+          curl -fSL https://github.com/elixir-lang/elixir/archive/refs/tags/v${{ env.ELIXIR_VERSION }}.tar.gz -o ./cache/elixir/elixir-${{ env.ELIXIR_VERSION }}.tar.gz
+          cd ./cache/elixir
+          tar -xzf elixir-${{ env.ELIXIR_VERSION }}.tar.gz
+          cd elixir-${{ env.ELIXIR_VERSION }}
+          make -j$(sysctl -n hw.ncpu) install
+
+          mix local.hex --force
+          mix local.rebar --force
+
+      # and we're almost ready for using precompiled Erlang/OTP now
+      # we just have to set the PATH and ERL_ROOTDIR env var
+      - name: Use precompiled Erlang
+        run: |
+          export PATH=$(pwd)/./cache/otp/usr/local/bin:$(pwd)/./cache/elixir/elixir-${{ env.ELIXIR_VERSION }}/bin:${PATH}
+          export ERL_ROOTDIR=$(pwd)/./cache/otp/usr/local/lib/erlang
+          
+          # do work below, e.g.,
+          # mix test
+```
+
+### With Action Cache
+
+```yaml
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mix_test:
+    runs-on: macos-11
+    env:
+      OTP_VERSION: "26.2.3"
+      ELIXIR_VERSION: "1.16.2"
+
+    steps:
+      # This will clone and setup your repo
+      - uses: actions/checkout@v4
+
+      # Cache precompiled Erlang/OTP for speedup
       - name: Cache OTP
         uses: actions/cache@v3
         id: cache-otp
@@ -191,7 +257,7 @@ jobs:
           path: ./cache/otp
           key: ${{ runner.os }}-otp-${{ env.OTP_VERSION }}
 
-      # download precompiled Erlang/OTP if there's a cache miss
+      # Download precompiled Erlang/OTP if there's a cache miss
       - name: Download OTP
         if: steps.cache-otp.outputs.cache-hit != 'true'
         run: |
@@ -200,8 +266,8 @@ jobs:
           cd ./cache/otp
           tar -xzf otp-v${{ env.OTP_VERSION }}-x86_64-apple-darwin.tar.gz
 
-      # cache Elixir (optional)
-      # download and compile Elixir (optional)
+      # Cache Elixir (optional)
+      # Download and compile Elixir (optional)
       #
       # these two steps below will setup cache for Elixir,
       # and if there's a cache miss, it will download and compile Elixir,
@@ -229,7 +295,7 @@ jobs:
           cd elixir-${{ env.ELIXIR_VERSION }}
           make -j$(sysctl -n hw.ncpu) install
 
-      # in this example, we install mix and rebar in a separate step
+      # In this example, we install mix and rebar in a separate step
       # and won't do cache for them
       - name: Install Mix and Rebar
         run: |
@@ -238,7 +304,7 @@ jobs:
           mix local.hex --force
           mix local.rebar --force
 
-      # and we're almost ready for using precompiled Erlang/OTP now
+      # And we're almost ready for using precompiled Erlang/OTP now
       # we just have to set the PATH and ERL_ROOTDIR env var
       - name: Use precompiled Erlang
         run: |

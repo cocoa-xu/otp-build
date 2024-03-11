@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   aarch64-linux-gnu:
-    if: startsWith(github.ref, 'refs/tags/v25.2') != 'true' && startsWith(github.ref, 'refs/tags/v25.1') != 'true' && startsWith(github.ref, 'refs/tags/v25.0') != 'true'
+    if: "!startsWith(github.ref_name, 'v25.2') && !startsWith(github.ref_name, 'v25.1') && !startsWith(github.ref_name, 'v25.0')"
     runs-on: ubuntu-latest
     env:
       OPENSSL_VERSION: "3.2.1"
@@ -100,7 +100,7 @@ jobs:
             otp-*.tar.gz
 
   aarch64-linux-musl:
-    if: startsWith(github.ref, 'refs/tags/v25.2') != 'true' && startsWith(github.ref, 'refs/tags/v25.1') != 'true' && startsWith(github.ref, 'refs/tags/v25.0') != 'true'
+    if: "!startsWith(github.ref_name, 'v25.2') && !startsWith(github.ref_name, 'v25.1') && !startsWith(github.ref_name, 'v25.0')"
     runs-on: ubuntu-latest
     env:
       OPENSSL_VERSION: "3.2.1"

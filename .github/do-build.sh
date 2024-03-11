@@ -36,4 +36,6 @@ cd /work && \
     make -j"$(nproc)" && \
     make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install && \
     cd "otp_${OTP_VERSION}" && \
-    tar -czf "/work/otp-${TRIPLET}.tar.gz" .
+    tar -czf "/work/otp-${TRIPLET}.tar.gz" . && \
+    cd /work && \
+    rm -rf "otp_src_${OTP_VERSION}" "otp_${OTP_VERSION}" "${OPENSSL_PERFIX_DIR}"

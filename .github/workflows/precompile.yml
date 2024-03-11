@@ -20,7 +20,7 @@ jobs:
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
     strategy:
       matrix:
-        arch: [x86_64, i686, aarch64, riscv64, ppc64le, s390x]
+        arch: [x86_64, i686, riscv64, ppc64le, s390x]
       fail-fast: false
 
     name: ${{ matrix.arch }}-linux-gnu
@@ -113,7 +113,7 @@ jobs:
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
     strategy:
       matrix:
-        arch: [x86_64, i386, aarch64, riscv64, ppc64le, s390x]
+        arch: [x86_64, i386, riscv64, ppc64le, s390x]
       fail-fast: false
 
     name: ${{ matrix.arch }}-linux-musl

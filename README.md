@@ -142,8 +142,8 @@ Precompiled OTP for NIF library CI builds.
     <td>arm64</td>
     <td>✓</td>
     <td>✓</td>
-    <td>✓</td>
     <td></td>
+    <td>✓</td>
     <td></td>
   </tr>
   <tr>

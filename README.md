@@ -162,7 +162,7 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
-    <td>✓</td>
+    <td></td>
   </tr>
   <tr>
     <td>14</td>

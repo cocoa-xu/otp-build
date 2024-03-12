@@ -1,4 +1,4 @@
-name: precompile-freebsd
+name: precompile-freebsd13
 
 on:
   workflow_dispatch:
@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   freebsd:
+    if: "!startsWith(github.ref, 'refs/tags/v23')"
     runs-on: ubuntu-latest
     env:
       OPENSSL_VERSION: "3.2.1"
@@ -28,19 +29,16 @@ jobs:
           - pair:
               fullversion: "13.2"
               major: "13"
-          - pair:
-              fullversion: "14.0"
-              major: "14"
       fail-fast: false
 
-    name: x86_64-unknown-freebsd${{ matrix.pair.fullversion }}
+    name: x86_64-unknown-freebsd13
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23') || startsWith(inputs.otp_version, 'v24') || startsWith(inputs.otp_version, 'refs/tags/v23')
+        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(inputs.otp_version, 'v24')
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
@@ -54,7 +52,7 @@ jobs:
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-x86_64-unknown-freebsd${{ matrix.pair.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-freebsd${{ matrix.pair.major }}.tar.gz"
 
       - name: Cache Precompiled OpenSSL for OTP 25 and above
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && !startsWith(inputs.otp_version, 'v24') && !startsWith(inputs.otp_version, 'refs/tags/v23')"
+        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(inputs.otp_version, 'v24')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -63,7 +61,7 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-freebsd${{ matrix.pair.major }}.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 25 and above
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && !startsWith(inputs.otp_version, 'v24') && !startsWith(inputs.otp_version, 'v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
+        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(inputs.otp_version, 'v24') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-unknown-freebsd${{ matrix.pair.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-freebsd${{ matrix.pair.major }}.tar.gz"
 
@@ -123,7 +121,7 @@ jobs:
             fi
             
             case "${OTP_VERSION}" in
-              24.* | 23.*)
+              24.*)
                 export OPENSSL_PERFIX_DIR=/tmp/openssl-${TRIPLET}
                 export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}.tar.gz"
                 ;;
@@ -144,16 +142,8 @@ jobs:
             gmake -j$(nproc)
             gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
             
-            cd "otp_${OTP_VERSION}"
+            cd "$(pwd)/otp_${OTP_VERSION}"
             tar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
-
-            cd ..
-            rm -rf "otp_${OTP_VERSION}"
-
-            cd ..
-            rm -rf "otp_src_${OTP_VERSION}"
-
-            ls -lah "${ROOT_DIR}"
 
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/v')

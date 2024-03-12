@@ -59,8 +59,8 @@ jobs:
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-x86_64-unknown-netbsd${{ matrix.pair.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-netbsd${{ matrix.pair.major }}.tar.gz"
 
-      - name: Cache Precompiled OpenSSL by Tag
-        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')
+      - name: Cache Precompiled OpenSSL for OTP 25 and above
+        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && !startsWith(inputs.otp_version, 'v24') && !startsWith(inputs.otp_version, 'refs/tags/v23')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -68,13 +68,13 @@ jobs:
           path: |
             ./openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-netbsd${{ matrix.pair.major }}.tar.gz
 
-      - name: Download Precompiled OpenSSL by Tag
+      - name: Download Precompiled OpenSSL for OTP 25 and above
         if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && !startsWith(inputs.otp_version, 'v24') && !startsWith(inputs.otp_version, 'v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-unknown-netbsd${{ matrix.pair.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-netbsd${{ matrix.pair.major }}.tar.gz"
 
-      - name: Cache OTP Source Code
-        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')
+      - name: Cache OTP Source Code by Tag
+        if: startsWith(github.ref, 'refs/tags/v')
         id: cache-otp
         uses: actions/cache@v4
         with:
@@ -83,7 +83,7 @@ jobs:
             ./otp_src_${{ github.ref_name }}.tar.gz
 
       - name: Download OTP Source Code
-        if: (startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')) && steps.cache-otp.outputs.cache-hit != 'true'
+        if: startsWith(github.ref, 'refs/tags/v') && steps.cache-otp.outputs.cache-hit != 'true'
         run: |
           export OTP_VERSION=${GITHUB_REF##*/v}
           echo "OTP_VERSION: $OTP_VERSION"
@@ -91,7 +91,7 @@ jobs:
           curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
 
       - name: Cache OTP Source Code from workflow_dispatch
-        if: startsWith(inputs.otp_version, 'v24') || startsWith(inputs.otp_version, 'v23')
+        if: startsWith(inputs.otp_version, 'v')
         id: cache-otp-workflow_dispatch
         uses: actions/cache@v4
         with:
@@ -99,8 +99,8 @@ jobs:
           path: |
             ./otp_src_${{ inputs.otp_version }}.tar.gz
 
-      - name: Download OTP Source Code by Tag
-        if: (startsWith(inputs.otp_version, 'v24') || startsWith(inputs.otp_version, 'v23')) && steps.cache-otp-workflow_dispatch.outputs.cache-hit != 'true'
+      - name: Download OTP Source Code from workflow_dispatch
+        if: startsWith(inputs.otp_version, 'v') && steps.cache-otp-workflow_dispatch.outputs.cache-hit != 'true'
         run: |
           export OTP_VERSION=${{ inputs.otp_version }}
           export OTP_VERSION=${OTP_VERSION##v}

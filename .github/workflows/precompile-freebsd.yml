@@ -114,11 +114,16 @@ jobs:
 
           run: |
             export TRIPLET=x86_64-unknown-freebsd${{ matrix.pair.major }}
-            export OTP_VERSION="${GITHUB_REF##*/v}"
             export ROOT_DIR="$(pwd)"
-
-            case "${{ github.ref_name }}" in
-              v24.* | v23.*)
+            export OTP_VERSION=${{ inputs.otp_version }}
+            export OTP_VERSION=${OTP_VERSION##v}
+            if [ -z "${OTP_VERSION}" ]; then
+              export OTP_VERSION=${GITHUB_REF##*/v}
+              echo "OTP_VERSION: $OTP_VERSION"
+            fi
+            
+            case "${OTP_VERSION}" in
+              24.* | 23.*)
                 export OPENSSL_PERFIX_DIR=/tmp/openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}
                 export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}.tar.gz"
                 ;;
@@ -130,16 +135,25 @@ jobs:
 
             mkdir -p "${OPENSSL_PERFIX_DIR}"
             tar -C "${OPENSSL_PERFIX_DIR}" -xzf "${OPENSSL_ARCHIVE}"
-            tar -xzf "otp_src_${GITHUB_REF_NAME}.tar.gz"
+            rm -f "${OPENSSL_ARCHIVE}"
+            tar -xzf "otp_src_v${OTP_VERSION}.tar.gz"
+            rm -f "otp_src_v${OTP_VERSION}.tar.gz"
             cd "otp_src_${OTP_VERSION}"
+
             ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
             gmake -j$(nproc)
             gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
+            
             cd "otp_${OTP_VERSION}"
             tar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
 
-            cd "${ROOT_DIR}"
-            rm -rf "otp_src_${OTP_VERSION}" "otp_${OTP_VERSION}" "${OPENSSL_PERFIX_DIR}"
+            cd ..
+            rm -rf "otp_${OTP_VERSION}"
+
+            cd ..
+            rm -rf "otp_src_${OTP_VERSION}"
+
+            ls -lah "${ROOT_DIR}"
 
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/v')

@@ -124,7 +124,7 @@ jobs:
             
             case "${OTP_VERSION}" in
               24.* | 23.*)
-                export OPENSSL_PERFIX_DIR=/tmp/openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}
+                export OPENSSL_PERFIX_DIR=/tmp/openssl-${TRIPLET}
                 export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}.tar.gz"
                 ;;
               *)

@@ -30,7 +30,9 @@ esac
 cd /work && \
     mkdir -p "${OPENSSL_PERFIX_DIR}" && \
     tar -C "${OPENSSL_PERFIX_DIR}" -xzf "${OPENSSL_ARCHIVE}" && \
-    tar -xzf "otp_src_${GITHUB_REF_NAME}.tar.gz" && \
+    rm -rf "otp_src_${OTP_VERSION}" && \
+    mkdir -p "otp_src_${OTP_VERSION}" && \
+    tar -xzf "otp_src_${GITHUB_REF_NAME}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1 && \
     cd "otp_src_${OTP_VERSION}" && \
     ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib && \
     make -j"$(nproc)" && \

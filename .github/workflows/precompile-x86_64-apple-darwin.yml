@@ -67,7 +67,8 @@ jobs:
           export OTP_VERSION=${GITHUB_REF##*/v}
           echo "OTP_VERSION: $OTP_VERSION"
           echo "github.ref_name: ${{ github.ref_name }}"
-          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz" || \
+          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
 
       - name: Compile OTP
         run: |

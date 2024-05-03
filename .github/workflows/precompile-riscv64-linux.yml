@@ -160,7 +160,7 @@ jobs:
 
       - name: Pull docker image
         run: |
-          sudo docker pull --platform=linux/riscv64 alpine:latest
+          sudo docker pull --platform=linux/riscv64 alpine:edge
 
       - name: Install binfmt
         run: |

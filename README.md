@@ -26,7 +26,7 @@ Precompiled OTP for NIF library CI builds.
     <td>25.0-25.3.2.12</td>
     <td>24.3-24.3.4.17</td>
     <td>24.0-24.2.2</td>
-    <td>23.3.4.19</td>
+    <td>23.3.4.19-23.3.4.20</td>
   </tr>
   <tr>
     <td><b>OS ↓</b></td>
@@ -179,7 +179,7 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
-    <td></td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>14</td>
@@ -200,7 +200,7 @@ Precompiled OTP for NIF library CI builds.
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
-    <td></td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>NetBSD</td>

@@ -126,10 +126,10 @@ Precompiled OTP for NIF library CI builds.
   <tr>
     <td>riscv64</td>
     <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
     <td></td>
   </tr>
   <tr>

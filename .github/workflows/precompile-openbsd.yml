@@ -143,9 +143,10 @@ jobs:
 
             ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
             gmake -j$(getconf NPROCESSORS_ONLN)
+            echo "Install OTP to otp_${OTP_VERSION}"
             gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
-            cd "$(pwd)/otp_${OTP_VERSION}"
             echo "Create tarball at ${ROOT_DIR}/otp-${TRIPLET}.tar.gz"
+            cd "$(pwd)/otp_${OTP_VERSION}"
             gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
             cd ..
             rm -rf "otp_${OTP_VERSION}"

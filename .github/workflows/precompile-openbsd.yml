@@ -131,11 +131,11 @@ jobs:
             esac
 
             mkdir -p "${OPENSSL_PERFIX_DIR}"
-            tar xf "${OPENSSL_ARCHIVE}" -C "${OPENSSL_PERFIX_DIR}" 
+            tar xzf "${OPENSSL_ARCHIVE}" -C "${OPENSSL_PERFIX_DIR}" 
             rm -f "${OPENSSL_ARCHIVE}"
             rm -rf otp_src_${OTP_VERSION}
             mkdir -p otp_src_${OTP_VERSION}
-            tar xf "otp_src_${OTP_VERSION}.tar.gz" -C otp_src_${OTP_VERSION} --strip-components=1
+            tar xzf "otp_src_${OTP_VERSION}.tar.gz" -C otp_src_${OTP_VERSION} --strip-components=1
             rm -f "otp_src_v${OTP_VERSION}.tar.gz"
             cd "otp_src_${OTP_VERSION}"
 

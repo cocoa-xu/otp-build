@@ -143,16 +143,12 @@ jobs:
             ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
             gmake -j$(getconf NPROCESSORS_ONLN)
             gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
-
             cd "$(pwd)/otp_${OTP_VERSION}"
             gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
-
             cd ..
             rm -rf "otp_${OTP_VERSION}"
-
             cd "${ROOT_DIR}"
             rm -rf "otp_src_${OTP_VERSION}"
-
             ls -lah "${ROOT_DIR}"
 
       - uses: softprops/action-gh-release@v2

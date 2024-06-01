@@ -24,7 +24,7 @@ jobs:
       MS_OPENJDK_TAG: "jdk-16.0.2-ga"
       MS_OPENJDK_VERSION_PATH: "16.0.2.7-hotspot"
       NSIS_VERSION: "3.09"
-      OPENSSL_VERSION: "3.2.1"
+      OPENSSL_VERSION: "3.3.0"
     steps:
       - name: Enable WSL and Virtual Machine Platform
         run: |

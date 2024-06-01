@@ -21,7 +21,7 @@ jobs:
       WSL_UBUNTU_URL: "https://aka.ms/wslubuntu2004"
       LLVM_MINGW_VERSION: "20231128"
       NSIS_VERSION: "3.09"
-      OPENSSL_VERSION: "3.2.1"
+      OPENSSL_VERSION: "3.3.0"
     steps:
       - name: Enable WSL and Virtual Machine Platform
         run: |

@@ -16,7 +16,7 @@ jobs:
   linux-gnu:
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.1"
+      OPENSSL_VERSION: "3.3.0"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
     strategy:
       matrix:

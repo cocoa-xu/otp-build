@@ -17,7 +17,7 @@ jobs:
     if: "!startsWith(github.ref, 'refs/tags/v23')"
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.1"
+      OPENSSL_VERSION: "3.3.0"
       OPENSSL_VERSION_OTP_24: "1.1.1w"
 
     name: riscv64-linux-gnu
@@ -104,7 +104,7 @@ jobs:
     if: "!startsWith(github.ref, 'refs/tags/v23')"
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.2.1"
+      OPENSSL_VERSION: "3.3.0"
       OPENSSL_VERSION_OTP_24: "1.1.1w"
 
     name: riscv64-linux-musl

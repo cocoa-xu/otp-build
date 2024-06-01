@@ -107,7 +107,7 @@ jobs:
           release: ${{ env.OPENBSD_FULLVERSION }}
           usesh: true
           prepare: |
-            pkg_add curl gmake gtar
+            pkg_add curl gmake gtar-1.34
 
           run: |
             export TRIPLET=x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}

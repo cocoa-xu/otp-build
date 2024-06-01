@@ -143,9 +143,17 @@ jobs:
             gmake -j$(getconf NPROCESSORS_ONLN)
             echo "install otp_${OTP_VERSION}..."
             gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
-            echo "archive otp_${OTP_VERSION}..."
-            echo "gtar -czf ${ROOT_DIR}/otp-${TRIPLET}.tar.gz -C $(pwd)/otp_${OTP_VERSION} ."
-            gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" -C "$(pwd)/otp_${OTP_VERSION}" .
+
+            cd "otp_${OTP_VERSION}"
+            gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
+
+            cd ..
+            rm -rf "otp_${OTP_VERSION}"
+
+            cd ..
+            rm -rf "otp_src_${OTP_VERSION}"
+
+            ls -lah "${ROOT_DIR}"
 
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/v')

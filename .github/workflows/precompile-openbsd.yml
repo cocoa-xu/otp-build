@@ -113,6 +113,7 @@ jobs:
           run: |
             export TRIPLET=x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}
             export ROOT_DIR="$(pwd)"
+            echo "ROOT_DIR: $ROOT_DIR"
             export OTP_VERSION=${{ inputs.otp_version }}
             export OTP_VERSION=${OTP_VERSION##v}
             if [ -z "${OTP_VERSION}" ]; then
@@ -144,6 +145,7 @@ jobs:
             gmake -j$(getconf NPROCESSORS_ONLN)
             gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
             cd "$(pwd)/otp_${OTP_VERSION}"
+            echo "Create tarball at ${ROOT_DIR}/otp-${TRIPLET}.tar.gz"
             gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
             cd ..
             rm -rf "otp_${OTP_VERSION}"

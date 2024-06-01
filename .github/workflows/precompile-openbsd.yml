@@ -134,7 +134,6 @@ jobs:
 
             mkdir -p "${OPENSSL_PERFIX_DIR}"
             tar xzf "${OPENSSL_ARCHIVE}" -C "${OPENSSL_PERFIX_DIR}" 
-            rm -f "${OPENSSL_ARCHIVE}"
             rm -rf "otp_src_${OTP_VERSION}"
             mkdir -p "otp_src_${OTP_VERSION}"
             gtar xzf "otp_src_v${OTP_VERSION}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1
@@ -152,24 +151,66 @@ jobs:
             rm -rf "otp_${OTP_VERSION}"
             cd "${ROOT_DIR}"
             rm -rf "otp_src_${OTP_VERSION}"
+            rm -f "${OPENSSL_ARCHIVE}"
             ls -lah "${ROOT_DIR}"
 
       - name: check outputs
+        id: check-outputs
         run: |
           export TRIPLET=x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}
-          export ROOT_DIR="$(pwd)"
-          export OTP_VERSION=${{ inputs.otp_version }}
-          export OTP_VERSION=${OTP_VERSION##v}
-          if [ -z "${OTP_VERSION}" ]; then
-            export OTP_VERSION=${GITHUB_REF##*/v}
-            echo "OTP_VERSION: $OTP_VERSION"
-          fi
           if [ ! -f "otp-${TRIPLET}.tar.gz" ]; then
-            cd "otp_src_${OTP_VERSION}"
-            make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
-            cd "otp_${OTP_VERSION}"
-            tar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
+            echo "has_tarball=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_tarball=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Take 2
+        if: steps.check-outputs.outputs.has_tarball == 'false'
+        uses: vmactions/openbsd-vm@v1
+        with:
+          envs: "OPENSSL_VERSION OPENSSL_VERSION_OTP_24_AND_BELOW"
+          release: ${{ env.OPENBSD_FULLVERSION }}
+          usesh: true
+          sync: rsync
+          prepare: |
+            pkg_add curl gmake gtar-1.34
+
+          run: |
+            export TRIPLET=x86_64-unknown-openbsd${{ env.OPENBSD_MAJOR_VERSION }}
+            export ROOT_DIR="$(pwd)"
+            echo "ROOT_DIR: $ROOT_DIR"
+            export OTP_VERSION=${{ inputs.otp_version }}
+            export OTP_VERSION=${OTP_VERSION##v}
+            if [ -z "${OTP_VERSION}" ]; then
+              export OTP_VERSION=${GITHUB_REF##*/v}
+              echo "OTP_VERSION: $OTP_VERSION"
+            fi
+            
+            case "${OTP_VERSION}" in
+              24.* | 23.*)
+                export OPENSSL_PERFIX_DIR=/tmp/openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}
+                export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}.tar.gz"
+                ;;
+              *)
+                export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}
+                export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
+                ;;
+            esac
+
+            mkdir -p "${OPENSSL_PERFIX_DIR}"
+            tar xzf "${OPENSSL_ARCHIVE}" -C "${OPENSSL_PERFIX_DIR}" 
+            cd "otp_src_${OTP_VERSION}"
+            echo "Install OTP to otp_${OTP_VERSION}"
+            gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
+            echo "Create tarball at ${ROOT_DIR}/otp-${TRIPLET}.tar.gz"
+            cd "$(pwd)/otp_${OTP_VERSION}"
+            gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
+            cd ..
+            rm -rf "otp_${OTP_VERSION}"
+            cd "${ROOT_DIR}"
+            rm -rf "otp_src_${OTP_VERSION}"
+            rm -f "${OPENSSL_ARCHIVE}"
+            ls -lah "${ROOT_DIR}"
 
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/v')
@@ -185,7 +226,7 @@ jobs:
           files: |
             otp-*.tar.gz
 
-      - name: check outputs
+      - name: Check tarball again
         run: |
           ls -lah
 

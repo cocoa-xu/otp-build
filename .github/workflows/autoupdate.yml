@@ -18,17 +18,35 @@ jobs:
         id: otp-version
         run: |
           pip3 install -U lastversion
+          OTP27_VERSION=$(lastversion -b 27 erlang)
           OTP26_VERSION=$(lastversion -b 26 erlang)
           OTP25_VERSION=$(lastversion -b 25 erlang)
           OTP24_VERSION=$(lastversion -b 24 erlang)
 
+          echo "Latest version of Erlang/OTP 27 is ${OTP27_VERSION}"
           echo "Latest version of Erlang/OTP 26 is ${OTP26_VERSION}"
           echo "Latest version of Erlang/OTP 25 is ${OTP25_VERSION}"
           echo "Latest version of Erlang/OTP 24 is ${OTP24_VERSION}"
 
+          echo "tag27=v${OTP27_VERSION}" >> $GITHUB_OUTPUT
           echo "tag26=v${OTP26_VERSION}" >> $GITHUB_OUTPUT
           echo "tag25=v${OTP25_VERSION}" >> $GITHUB_OUTPUT
           echo "tag24=v${OTP24_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Check if Erlang/OTP 27 tag exists
+        uses: mukunku/tag-exists-action@v1.5.0
+        id: check-tag-otp27
+        with: 
+          tag: ${{ steps.otp-version.outputs.tag27 }}
+          repo: 'cocoa-xu/otp-build'
+      
+      - name: Update if Erlang/OTP 27 tag not exists
+        if: steps.check-tag-otp27.outputs.exists == 'false'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ steps.otp-version.outputs.tag27 }}
+          git push origin ${{ steps.otp-version.outputs.tag27 }}
 
       - name: Check if Erlang/OTP 26 tag exists
         uses: mukunku/tag-exists-action@v1.5.0

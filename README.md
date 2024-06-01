@@ -52,7 +52,7 @@ Precompiled OTP for NIF library CI builds.
   </tr>
   <tr>
     <td>i686</td>
-    <td>✓</td>
+    <td>✓<sup>1</sup></td>
     <td>✓</td>
     <td>✓</td>
     <td>✓</td>
@@ -107,12 +107,12 @@ Precompiled OTP for NIF library CI builds.
   </tr>
   <tr>
     <td>i686</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
     <td>✓<sup>1</sup></td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>aarch64</td>
@@ -218,7 +218,7 @@ Precompiled OTP for NIF library CI builds.
 
 <footer>
   
-  *1. Compiled with `--disable-year2038`*
+  *1. Compiled with `--disable-year2038` from OTP 27.0 and onwards*
   
 </footer>
 

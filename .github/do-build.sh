@@ -27,6 +27,15 @@ case $TRIPLET in
         ;;
 esac
 
+case $TRIPLET in
+    i686-* | i386-* )
+        CONFIGURE_OPTIONS="--disable-year2038"
+        ;;
+    * )
+        CONFIGURE_OPTIONS=""
+        ;;
+esac
+
 cd /work && \
     mkdir -p "${OPENSSL_PERFIX_DIR}" && \
     tar -C "${OPENSSL_PERFIX_DIR}" -xzf "${OPENSSL_ARCHIVE}" && \
@@ -34,7 +43,7 @@ cd /work && \
     mkdir -p "otp_src_${OTP_VERSION}" && \
     tar -xzf "otp_src_${GITHUB_REF_NAME}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1 && \
     cd "otp_src_${OTP_VERSION}" && \
-    ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib && \
+    ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib ${CONFIGURE_OPTIONS} && \
     make -j"$(nproc)" && \
     make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install && \
     cd "otp_${OTP_VERSION}" && \

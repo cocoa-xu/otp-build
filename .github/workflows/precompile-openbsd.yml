@@ -106,6 +106,7 @@ jobs:
           envs: "OPENSSL_VERSION OPENSSL_VERSION_OTP_24_AND_BELOW"
           release: ${{ env.OPENBSD_FULLVERSION }}
           usesh: true
+          sync: rsync
           prepare: |
             pkg_add curl gmake gtar-1.34
 
@@ -133,24 +134,23 @@ jobs:
             mkdir -p "${OPENSSL_PERFIX_DIR}"
             tar xzf "${OPENSSL_ARCHIVE}" -C "${OPENSSL_PERFIX_DIR}" 
             rm -f "${OPENSSL_ARCHIVE}"
-            rm -rf otp_src_${OTP_VERSION}
-            mkdir -p otp_src_${OTP_VERSION}
-            gtar xzf "otp_src_v${OTP_VERSION}.tar.gz" -C otp_src_${OTP_VERSION} --strip-components=1
+            rm -rf "otp_src_${OTP_VERSION}"
+            mkdir -p "otp_src_${OTP_VERSION}"
+            gtar xzf "otp_src_v${OTP_VERSION}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1
             rm -f "otp_src_v${OTP_VERSION}.tar.gz"
             cd "otp_src_${OTP_VERSION}"
 
             ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
             gmake -j$(getconf NPROCESSORS_ONLN)
-            echo "install otp_${OTP_VERSION}..."
             gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
 
-            cd "otp_${OTP_VERSION}"
+            cd "$(pwd)/otp_${OTP_VERSION}"
             gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
 
             cd ..
             rm -rf "otp_${OTP_VERSION}"
 
-            cd ..
+            cd "${ROOT_DIR}"
             rm -rf "otp_src_${OTP_VERSION}"
 
             ls -lah "${ROOT_DIR}"
@@ -168,6 +168,10 @@ jobs:
           name: ${{ github.event.inputs.otp_version }}
           files: |
             otp-*.tar.gz
+
+      - name: check outputs
+        run: |
+          ls -lah
 
   deploy-openbsd:
     runs-on: ubuntu-latest

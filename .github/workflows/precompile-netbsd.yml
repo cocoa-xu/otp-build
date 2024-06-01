@@ -10,7 +10,7 @@ on:
       - "v*"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.otp_version }}
   cancel-in-progress: true
 
 permissions:

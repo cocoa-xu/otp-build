@@ -76,7 +76,8 @@ jobs:
           bash ./script-to-build-gnu.sh "${{ steps.otp.outputs.version }}" "${{ env.DOCKER_PLATFORM }}" "${{ env.DOCKER_IMAGE }}"
 
       - uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ steps.otp.outputs.version }}
+          name: ${{ steps.otp.outputs.version }}
           files: |
             otp-*.tar.gz

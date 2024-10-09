@@ -11,6 +11,8 @@ OTP_VERSION=${GITHUB_REF_NAME##v}
 OPENSSL_PERFIX_DIR="/work/openssl-${OPENSSL_VERSION}-${TRIPLET}"
 OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
 
+export DEBIAN_FRONTEND=noninteractive
+
 case $TRIPLET in
     riscv64-linux-gnu )
         apt-get update && apt-get install -y gcc g++ perl libncurses5-dev make

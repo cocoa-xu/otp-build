@@ -1,0 +1,82 @@
+name: precompile-armv7l-linux-guneabihf
+
+on:
+  workflow_dispatch:
+    inputs:
+      otp_verison:
+        description: 'OTP Version'
+        required: true
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  armv7l-linux-guneabihf:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: "armv7l-linux-gnueabihf"
+      DOCKER_PLATFORM: linux/arm/v7
+      DOCKER_IMAGE: ubuntu:20:04
+
+    name: armv7l-linux-guneabihf
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get OTP Version
+        id: otp
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ inputs.otp_verison }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            export OTP_VERSION=${GITHUB_REF##*/v}
+            echo "version=v${OTP_VERSION}" >> $GITHUB_OUTPUT
+          else
+            exit 1
+          fi
+
+      - name: Cache OTP Source Code
+        id: cache-otp
+        uses: actions/cache@v4
+        with:
+          key: otp-${{ steps.otp.outputs.version }}
+          path: |
+            ./otp_src_${{ steps.otp.outputs.version }}.tar.gz
+
+      - name: Download OTP Source Code
+        if: steps.cache-otp.outputs.cache-hit != 'true'
+        run: |
+          export OTP_VERSION="${{ steps.otp.outputs.version }}"
+          export OTP_VERSION="${OTP_VERSION#v}"
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ steps.otp.outputs.version }}.tar.gz" || \
+          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${{ steps.otp.outputs.version }}.tar.gz"
+
+      - name: Pull docker image
+        run: |
+          sudo docker pull --platform=${{ env.DOCKER_PLATFORM }} ${{ env.DOCKER_IMAGE }}
+
+      - name: Install binfmt
+        run: |
+          sudo apt update
+          sudo apt install -y binfmt-support qemu-user-static
+
+      - name: Compile OTP
+        run: |
+          cp .github/script-to-build-armv7l.sh ./
+          cp .github/do-build.sh ./
+
+          bash ./script-to-build-armv7l.sh "${{ steps.otp.outputs.version }}" "${{ env.DOCKER_PLATFORM }}" "${{ env.DOCKER_IMAGE }}"
+
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            otp-*.tar.gz

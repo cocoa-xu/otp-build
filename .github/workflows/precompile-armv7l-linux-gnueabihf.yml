@@ -70,10 +70,10 @@ jobs:
 
       - name: Compile OTP
         run: |
-          cp .github/script-to-build-gnu.sh ./
+          cp .github/script-to-build-armv7l.sh ./
           cp .github/do-build.sh ./
 
-          bash ./script-to-build-gnu.sh "${{ steps.otp.outputs.version }}" "${{ env.DOCKER_PLATFORM }}" "${{ env.DOCKER_IMAGE }}"
+          bash ./script-to-build-armv7l.sh "${{ steps.otp.outputs.version }}" "${{ env.DOCKER_PLATFORM }}" "${{ env.DOCKER_IMAGE }}"
 
       - uses: softprops/action-gh-release@v2
         with:

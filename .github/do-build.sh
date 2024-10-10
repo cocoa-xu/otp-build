@@ -58,8 +58,11 @@ rm -rf "otp_src_${OTP_VERSION}" && \
         ./configure --without-javac --disable-dynamic-ssl-lib ${CONFIGURE_OPTIONS} ;
     fi && \
     make -j"$(nproc)" && \
-    make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install && \
-    cd "otp_${OTP_VERSION}" && \
+    export DESTDIR="$(pwd)/otp_${OTP_VERSION}" && \
+    make DESTDIR="${DESTDIR}" install && \
+    cd "${DESTDIR}/usr/local/lib/erlang" && \
+    { ./Install -sasl "$(pwd)" || true ; } && \
+    cd "${DESTDIR}" && \
     tar -czf "/work/otp-${TRIPLET}.tar.gz" . && \
     cd /work && \
     rm -rf "otp_src_${OTP_VERSION}" "otp_${OTP_VERSION}" "${OPENSSL_PERFIX_DIR}"

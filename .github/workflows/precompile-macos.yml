@@ -33,7 +33,6 @@ jobs:
       build: ${{ steps.build-check.outputs.build }}
       target: ${{ matrix.job.target }}
     env:
-      TARGET_TRIPLET: "x86_64-apple-darwin"
       OPENSSL_VERSION: "3.3.0"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
     strategy:
@@ -150,17 +149,17 @@ jobs:
 
           make DESTDIR="${DESTDIR}" install
           cd "${DESTDIR}"
-          tar -czf "${ROOTDIR}/build/otp-${{ env.TARGET_TRIPLET }}.tar.gz" .
+          tar -czf "${ROOTDIR}/build/otp-${{ matrix.job.target }}.tar.gz" .
 
           cd "${OTP_SRC_DIR}"
           make release
           cd ./release/*
           ./Install -sasl "$(pwd)"
-          tar -czf "${ROOTDIR}/build/otp-release-${{ env.TARGET_TRIPLET }}.tar.gz" .
+          tar -czf "${ROOTDIR}/build/otp-release-${{ matrix.job.target }}.tar.gz" .
 
           cd "${ROOTDIR}/build"
-          shasum -a 256 otp-${{ env.TARGET_TRIPLET }}.tar.gz | tee otp-${{ env.TARGET_TRIPLET }}.tar.gz.sha256
-          shasum -a 256 otp-release-${{ env.TARGET_TRIPLET }}.tar.gz | tee otp-release-${{ env.TARGET_TRIPLET }}.tar.gz.sha256
+          shasum -a 256 otp-${{ matrix.job.target }}.tar.gz | tee otp-${{ matrix.job.target }}.tar.gz.sha256
+          shasum -a 256 otp-release-${{ matrix.job.target }}.tar.gz | tee otp-release-${{ matrix.job.target }}.tar.gz.sha256
 
       - uses: softprops/action-gh-release@v2
         if: steps.build-check.outputs.build == 'true'

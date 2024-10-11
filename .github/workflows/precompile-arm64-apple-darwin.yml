@@ -26,6 +26,7 @@ jobs:
     outputs:
       otp_version: ${{ steps.otp.outputs.version }}
     env:
+      TARGET_TRIPLET: "arm64-apple-darwin"
       OPENSSL_VERSION: "3.3.0"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
 
@@ -52,28 +53,28 @@ jobs:
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
-          key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-arm64-apple-darwin
+          key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ env.TARGET_TRIPLET }}
           path: |
-            ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-arm64-apple-darwin.tar.gz
+            ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ env.TARGET_TRIPLET }}.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 24 (24.3+)
         if: startsWith(steps.otp.outputs.version, 'v24') && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-arm64-apple-darwin.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-arm64-apple-darwin.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-${{ env.TARGET_TRIPLET }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ env.TARGET_TRIPLET }}.tar.gz"
 
       - name: Cache Precompiled OpenSSL
         if: startsWith(steps.otp.outputs.version, 'v24') != 'true'
         id: cache-openssl
         uses: actions/cache@v4
         with:
-          key: openssl-${{ env.OPENSSL_VERSION }}-arm64-apple-darwin
+          key: openssl-${{ env.OPENSSL_VERSION }}-${{ env.TARGET_TRIPLET }}
           path: |
-            ./openssl-${{ env.OPENSSL_VERSION }}-arm64-apple-darwin.tar.gz
+            ./openssl-${{ env.OPENSSL_VERSION }}-${{ env.TARGET_TRIPLET }}.tar.gz
 
       - name: Download Precompiled OpenSSL
         if: startsWith(steps.otp.outputs.version, 'v24') != 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-arm64-apple-darwin.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-arm64-apple-darwin.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ env.TARGET_TRIPLET }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ env.TARGET_TRIPLET }}.tar.gz"
 
       - name: Cache OTP Source Code
         id: cache-otp
@@ -106,15 +107,17 @@ jobs:
           mkdir -p "${OTP_SRC_DIR}"
           rm -rf "${DESTDIR}"
           mkdir -p "${DESTDIR}"
+          rm -rf "${ROOTDIR}/build"
+          mkdir -p "${ROOTDIR}/build"
 
           case "${{ steps.otp.outputs.version }}" in
             v24.*)
-              export OPENSSL_ARCHIVE="openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-arm64-apple-darwin.tar.gz"
-              export PERFIX_DIR="/tmp/openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-arm64-apple-darwin"
+              export OPENSSL_ARCHIVE="openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ env.TARGET_TRIPLET }}.tar.gz"
+              export PERFIX_DIR="/tmp/openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ env.TARGET_TRIPLET }}"
               ;;
             *)
-              export OPENSSL_ARCHIVE="openssl-${{ env.OPENSSL_VERSION }}-arm64-apple-darwin.tar.gz"
-              export PERFIX_DIR="/tmp/openssl-${{ env.OPENSSL_VERSION }}-arm64-apple-darwin"
+              export OPENSSL_ARCHIVE="openssl-${{ env.OPENSSL_VERSION }}-${{ env.TARGET_TRIPLET }}.tar.gz"
+              export PERFIX_DIR="/tmp/openssl-${{ env.OPENSSL_VERSION }}-${{ env.TARGET_TRIPLET }}"
               ;;
           esac
 
@@ -126,13 +129,20 @@ jobs:
           cd "${OTP_SRC_DIR}"
           ./configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
           make -j"$(sysctl -n hw.ncpu)"
-          make DESTDIR="${DESTDIR}" install
-          cd "${DESTDIR}/usr/local/lib/erlang"
-          ./Install -sasl "$(pwd)"
 
-          mkdir -p "${ROOTDIR}/build"
+          make DESTDIR="${DESTDIR}" install
           cd "${DESTDIR}"
-          tar -czf "${ROOTDIR}/build/otp-arm64-apple-darwin.tar.gz" .
+          tar -czf "${ROOTDIR}/build/otp-${{ env.TARGET_TRIPLET }}.tar.gz" .
+
+          cd "${OTP_SRC_DIR}"
+          make release
+          cd "./release/*/"
+          ./Install -sasl "$(pwd)"
+          tar -czf "${ROOTDIR}/build/otp-release-${{ env.TARGET_TRIPLET }}.tar.gz" .
+
+          cd "${ROOTDIR}/build"
+          shasum -a 256 otp-${{ env.TARGET_TRIPLET }}.tar.gz | tee otp-${{ env.TARGET_TRIPLET }}.tar.gz.sha256
+          shasum -a 256 otp-release-${{ env.TARGET_TRIPLET }}.tar.gz | tee otp-release-${{ env.TARGET_TRIPLET }}.tar.gz.sha256
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -140,6 +150,7 @@ jobs:
           name: ${{ steps.otp.outputs.version }}
           files: |
             build/*.tar.gz
+            build/*.sha256
 
   deploy-arm64-apple-darwin:
     runs-on: ubuntu-latest

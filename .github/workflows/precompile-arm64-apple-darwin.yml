@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   arm64-apple-darwin:
-    runs-on: macos-12
+    runs-on: macos-14
     outputs:
       otp_version: ${{ steps.otp.outputs.version }}
     env:
@@ -124,8 +124,8 @@ jobs:
 
           tar -xzf "otp_src_${{ steps.otp.outputs.version }}.tar.gz" -C "${OTP_SRC}" --strip-components=1
           cd "${OTP_SRC_DIR}"
-          ./otp_build configure --xcomp-conf=xcomp/erl-xcomp-aarch64-darwin.conf --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
-          ./otp_build boot -a
+          ./otp_build configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
+          make -j"$(sysctl -n hw.ncpu)"
           make DESTDIR="${DESTDIR}" install
           cd "${DESTDIR}/usr/local/lib/erlang"
           ./Install -sasl "$(pwd)"

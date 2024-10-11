@@ -154,7 +154,7 @@ jobs:
 
           cd "${OTP_SRC_DIR}"
           make release
-          cd "./release/*/"
+          cd ./release/*
           ./Install -sasl "$(pwd)"
           tar -czf "${ROOTDIR}/build/otp-release-${{ env.TARGET_TRIPLET }}.tar.gz" .
 

@@ -79,9 +79,9 @@ jobs:
         id: cache-otp
         uses: actions/cache@v4
         with:
-          key: otp-${{ github.ref_name }}
+          key: otp-${{ steps.otp.outputs.version }}
           path: |
-            ./otp_src_${{ github.ref_name }}.tar.gz
+            ./otp_src_${{ steps.otp.outputs.version }}.tar.gz
 
       - name: Download OTP Source Code
         if: steps.cache-otp.outputs.cache-hit != 'true'
@@ -124,7 +124,7 @@ jobs:
 
           tar -xzf "otp_src_${{ steps.otp.outputs.version }}.tar.gz" -C "${OTP_SRC}" --strip-components=1
           cd "${OTP_SRC_DIR}"
-          ./otp_build configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
+          ./configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
           make -j"$(sysctl -n hw.ncpu)"
           make DESTDIR="${DESTDIR}" install
           cd "${DESTDIR}/usr/local/lib/erlang"

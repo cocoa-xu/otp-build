@@ -241,7 +241,7 @@ concurrency:
 
 jobs:
   mix_test:
-    runs-on: macos-11
+    runs-on: macos-12
     env:
       OTP_VERSION: "26.2.3"
       ELIXIR_VERSION: "1.16.2"
@@ -305,7 +305,7 @@ concurrency:
 
 jobs:
   mix_test:
-    runs-on: macos-11
+    runs-on: macos-12
     env:
       OTP_VERSION: "26.2.3"
       ELIXIR_VERSION: "1.16.2"

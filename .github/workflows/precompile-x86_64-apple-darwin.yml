@@ -1,6 +1,11 @@
 name: precompile-x86_64-apple-darwin
 
 on:
+  workflow_dispatch:
+    inputs:
+      otp_verison:
+        description: 'OTP Version'
+        required: true
   push:
     tags:
       - "v*"
@@ -15,6 +20,8 @@ permissions:
 jobs:
   x86_64-apple-darwin:
     runs-on: macos-12
+    outputs:
+      otp_version: ${{ steps.otp.outputs.version }}
     env:
       OPENSSL_VERSION: "3.3.0"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
@@ -25,8 +32,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Get OTP Version
+        id: otp
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ inputs.otp_verison }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            export OTP_VERSION=${GITHUB_REF##*/v}
+            echo "version=v${OTP_VERSION}" >> $GITHUB_OUTPUT
+          else
+            exit 1
+          fi
+
       - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')
+        if: startsWith(steps.otp.outputs.version, 'v24') || startsWith(steps.otp.outputs.version, 'v23')
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
@@ -35,12 +54,12 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-apple-darwin.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: (startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
+        if: (startsWith(steps.otp.outputs.version, 'v24') || startsWith(steps.otp.outputs.version, 'v23')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-x86_64-apple-darwin.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-apple-darwin.tar.gz"
 
       - name: Cache Precompiled OpenSSL
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23')"
+        if: "!startsWith(steps.otp.outputs.version, 'v24') && !startsWith(steps.otp.outputs.version, 'v23')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -49,7 +68,7 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-x86_64-apple-darwin.tar.gz
 
       - name: Download Precompiled OpenSSL
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
+        if: "!startsWith(steps.otp.outputs.version, 'v24') && !startsWith(steps.otp.outputs.version, 'v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-apple-darwin.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-apple-darwin.tar.gz"
 
@@ -57,24 +76,35 @@ jobs:
         id: cache-otp
         uses: actions/cache@v4
         with:
-          key: otp-${{ github.ref_name }}
+          key: otp-${{ steps.otp.outputs.version }}
           path: |
-            ./otp_src_${{ github.ref_name }}.tar.gz
+            ./otp_src_${{ steps.otp.outputs.version }}.tar.gz
 
       - name: Download OTP Source Code
         if: steps.cache-otp.outputs.cache-hit != 'true'
         run: |
-          export OTP_VERSION=${GITHUB_REF##*/v}
+          export OTP_VERSION=${{ steps.otp.outputs.version }}
+          export OTP_VERSION="${OTP_VERSION#v}"
           echo "OTP_VERSION: $OTP_VERSION"
-          echo "github.ref_name: ${{ github.ref_name }}"
-          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz" || \
-          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ steps.otp.outputs.version }}.tar.gz" || \
+          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${{ steps.otp.outputs.version }}.tar.gz"
 
       - name: Compile OTP
         run: |
-          export ROOTDIR="$(pwd)"
+          export OTP_VERSION=${{ steps.otp.outputs.version }}
+          export OTP_VERSION="${OTP_VERSION#v}"
 
-          case "${{ github.ref_name }}" in
+          export ROOTDIR="$(pwd)"
+          export OTP_SRC="otp_src_${OTP_VERSION}"
+          export OTP_SRC_DIR="${ROOTDIR}/${OTP_SRC}"
+          export DESTDIR="${ROOTDIR}/otp_${OTP_VERSION}"
+
+          rm -rf "${OTP_SRC_DIR}"
+          mkdir -p "${OTP_SRC_DIR}"
+          rm -rf "${DESTDIR}"
+          mkdir -p "${DESTDIR}"
+
+          case "${{ steps.otp.outputs.version }}" in
             v24.* | v23.*)
               export OPENSSL_ARCHIVE="openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-apple-darwin.tar.gz"
               export PERFIX_DIR="/tmp/openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-apple-darwin"
@@ -85,24 +115,26 @@ jobs:
               ;;
           esac
 
-          export OTP_VERSION="${GITHUB_REF##*/v}"
           mkdir -p "${PERFIX_DIR}"
           sudo tar -C "${PERFIX_DIR}" -xf "${OPENSSL_ARCHIVE}"
-          rm -rf otp_src_${OTP_VERSION}
-          mkdir -p otp_src_${OTP_VERSION}
-          tar -xzf "otp_src_${{ github.ref_name }}.tar.gz" -C otp_src_${OTP_VERSION} --strip-components=1
-          cd "otp_src_${OTP_VERSION}"
-          mkdir "otp_${OTP_VERSION}"
+          find "${PERFIX_DIR}" -name "*.dylib"  -exec rm {} \;
+
+          tar -xzf "otp_src_${{ steps.otp.outputs.version }}.tar.gz" -C "${OTP_SRC}" --strip-components=1
+          cd "${OTP_SRC_DIR}"
           ./configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
-          time make -j"$(sysctl -n hw.ncpu)"
-          make DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
+          make -j"$(sysctl -n hw.ncpu)"
+          make DESTDIR="${DESTDIR}" install
+          cd "${DESTDIR}/usr/local/lib/erlang"
+          ./Install -sasl "$(pwd)"
+
           mkdir -p "${ROOTDIR}/build"
-          cd "$(pwd)/otp_${OTP_VERSION}"
-          tar -czf "${ROOTDIR}/build/otp-x86_64-apple-darwin.tar.gz" .
+          cd "${DESTDIR}"
+          tar -czf "${ROOTDIR}/build/otp-arm64-apple-darwin.tar.gz" .
 
       - uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ steps.otp.outputs.version }}
+          name: ${{ steps.otp.outputs.version }}
           files: |
             build/*.tar.gz
 
@@ -111,8 +143,8 @@ jobs:
     needs: x86_64-apple-darwin
     steps:
       - name: deploy
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'cocoa-xu/otp-build'
+        if: github.repository == 'cocoa-xu/otp-build'
         env:
           DEPLOY_X86_64_MACOS_HOOK_URL: ${{ secrets.DEPLOY_X86_64_MACOS_HOOK_URL }}
         run: |
-          curl -sS --no-progress-meter "${DEPLOY_X86_64_MACOS_HOOK_URL}${{ github.ref_name }}"
+          curl -sS --no-progress-meter "${DEPLOY_X86_64_MACOS_HOOK_URL}${{ needs.x86_64-apple-darwin.outputs.otp_version }}"

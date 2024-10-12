@@ -30,8 +30,8 @@ jobs:
     runs-on: ${{ matrix.job.runs-on }}
     outputs:
       otp_version: ${{ steps.otp.outputs.version }}
-      build: ${{ steps.build-check.outputs.build }}
-      target: ${{ matrix.job.target }}
+      x86_64: ${{ steps.target.outputs.x86_64 }}
+      arm64: ${{ steps.target.outputs.arm64 }}
     env:
       OPENSSL_VERSION: "3.3.0"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
@@ -119,6 +119,7 @@ jobs:
 
       - name: Compile OTP
         if: steps.build-check.outputs.build == 'true'
+        id: target
         run: |
           export OTP_VERSION=${{ steps.otp.outputs.version }}
           export OTP_VERSION="${OTP_VERSION#v}"
@@ -161,6 +162,13 @@ jobs:
           shasum -a 256 otp-${{ matrix.job.target }}.tar.gz | tee otp-${{ matrix.job.target }}.tar.gz.sha256
           shasum -a 256 otp-release-${{ matrix.job.target }}.tar.gz | tee otp-release-${{ matrix.job.target }}.tar.gz.sha256
 
+          if [ "${{ matrix.job.target }}" == "arm64-apple-darwin" ]; then
+            echo "arm64=true" >> $GITHUB_OUTPUT
+          fi
+          if [ "${{ matrix.job.target }}" == "x86_64-apple-darwin" ]; then
+            echo "x86_64=true" >> $GITHUB_OUTPUT
+          fi
+
       - uses: softprops/action-gh-release@v2
         if: steps.build-check.outputs.build == 'true'
         with:
@@ -175,13 +183,14 @@ jobs:
     needs: build
     steps:
       - name: deploy
-        if: github.repository == 'cocoa-xu/otp-build' && needs.build.outputs.build == 'true'
+        if: github.repository == 'cocoa-xu/otp-build' && (needs.build.outputs.arm64 == 'true' || needs.build.outputs.x86_64 == 'true')
         env:
           DEPLOY_X86_64_MACOS_HOOK_URL: ${{ secrets.DEPLOY_X86_64_MACOS_HOOK_URL }}
           DEPLOY_ARM64_MACOS_HOOK_URL: ${{ secrets.DEPLOY_ARM64_MACOS_HOOK_URL }}
         run: |
-          if [ "${{ needs.build.outputs.target }}" == "arm64-apple-darwin" ] && [ "${{ needs.build.outputs.build }}" == "true" ]; then
+          if [ "${{ needs.build.outputs.arm64 }}" == "true" ]; then
             curl -sS --no-progress-meter "${DEPLOY_ARM64_MACOS_HOOK_URL}${{ needs.build.outputs.otp_version }}" ;
-          elif [ "${{ needs.build.outputs.target }}" == "x86_64-apple-darwin" ] && [ "${{ needs.build.outputs.build }}" == "true" ]; then
+          fi
+          if [ "${{ needs.build.outputs.x86_64 }}" == "true" ]; then
             curl -sS --no-progress-meter "${DEPLOY_X86_64_MACOS_HOOK_URL}${{ needs.build.outputs.otp_version }}" ;
           fi

@@ -193,7 +193,7 @@ jobs:
 
           if [ "${{ steps.build-check.outputs.with_wxwidgets }}" != "false" ]; then
             export WXWIDGETS_ARCHIVE="wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz"
-            sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}"
+            sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}" --strip-components=1
           fi
 
           tar -xzf "otp_src_${{ steps.build-check.outputs.version }}.tar.gz" -C "${OTP_SRC}" --strip-components=1

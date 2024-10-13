@@ -174,6 +174,8 @@ jobs:
           export OTP_SRC="otp_src_${OTP_VERSION}"
           export OTP_SRC_DIR="${ROOTDIR}/${OTP_SRC}"
           export DESTDIR="${ROOTDIR}/otp_${OTP_VERSION}"
+          export RELDIR="${ROOTDIR}/rel/otp_${OTP_VERSION}"
+          export CFLAGS="-Os -fno-common -mmacosx-version-min=11.0"
 
           rm -rf "${OTP_SRC_DIR}"
           mkdir -p "${OTP_SRC_DIR}"
@@ -205,18 +207,19 @@ jobs:
           else
             ./otp_build configure --without-javac --with-ssl="${PERFIX_DIR}"
           fi
-          ./otp_build boot -a
-          make -j"$(sysctl -n hw.ncpu)"
 
+          rm -rf "${RELDIR}"
+          ./otp_build boot -a
+          ./otp_build release -a "${RELDIR}"
+          cd "${RELDIR}"
+          ./Install -sasl "$(pwd)"
+          tar -czf "${ROOTDIR}/build/otp-release-${{ matrix.job.target }}.tar.gz" .
+
+          cd "${OTP_SRC_DIR}"
+          make -j"$(sysctl -n hw.ncpu)"
           make DESTDIR="${DESTDIR}" install
           cd "${DESTDIR}"
           tar -czf "${ROOTDIR}/build/otp-${{ matrix.job.target }}.tar.gz" .
-
-          cd "${OTP_SRC_DIR}"
-          ./otp_build release
-          cd ./release/*
-          ./Install -sasl "$(pwd)"
-          tar -czf "${ROOTDIR}/build/otp-release-${{ matrix.job.target }}.tar.gz" .
 
           cd "${ROOTDIR}/build"
           shasum -a 256 otp-${{ matrix.job.target }}.tar.gz | tee otp-${{ matrix.job.target }}.tar.gz.sha256

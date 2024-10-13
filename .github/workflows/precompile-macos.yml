@@ -61,9 +61,6 @@ jobs:
       DEFAULT_WXWIDGETS_VERSION: "3.2.6"
       DEFAULT_OPENSSL_VERSION: "3.3.0"
       DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
-      
-      OPENSSL_VERSION: "3.3.0"
-      OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
     strategy:
       fail-fast: false
       matrix:
@@ -103,7 +100,7 @@ jobs:
             echo "openssl_version=${{ inputs.openssl_version }}" >> $GITHUB_OUTPUT
           fi
 
-          export OTP_VERSION="${BUILD_VERSION_V#v}"
+          export OTP_VERSION="${OTP_VERSION_V#v}"
           echo "version=${OTP_VERSION}" >> $GITHUB_OUTPUT
           echo "major=${OTP_MAJOR_VER}" >> $GITHUB_OUTPUT
           if [ "${OTP_MAJOR_VER}" -lt "25" ]; then

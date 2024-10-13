@@ -144,8 +144,8 @@ jobs:
         run: |
           export OPENSSL_FILENAME="openssl-${{ matrix.job.target }}.tar.gz"
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}" -o "${OPENSSL_FILENAME}"
-          # curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}.sha256" -o "${OPENSSL_FILENAME}.sha256"
-          # shasum -c "${OTP_SRC_FILENAME}.sha256"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}.sha256" -o "${OPENSSL_FILENAME}.sha256"
+          shasum -c "${OTP_SRC_FILENAME}.sha256"
 
       - name: Cache Precompiled wxWidgets
         if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false'
@@ -194,15 +194,18 @@ jobs:
           if [ "${{ steps.build-check.outputs.with_wxwidgets }}" != "false" ]; then
             export WXWIDGETS_ARCHIVE="wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz"
             sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}" --strip-components=3
+
+            /usr/local/bin/wx-config --version
           fi
 
           tar -xzf "otp_src_${{ steps.build-check.outputs.version }}.tar.gz" -C "${OTP_SRC}" --strip-components=1
           cd "${OTP_SRC_DIR}"
           if [ "${{ steps.build-check.outputs.with_openssl }}" = "static" ]; then
-            ./configure --without-javac --disable-debug --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
+            ./otp_build configure --without-javac --with-ssl="${PERFIX_DIR}" --disable-dynamic-ssl-lib
           else
-            ./configure --without-javac --disable-debug --with-ssl="${PERFIX_DIR}"
+            ./otp_build configure --without-javac --with-ssl="${PERFIX_DIR}"
           fi
+          ./otp_build boot -a
           make -j"$(sysctl -n hw.ncpu)"
 
           make DESTDIR="${DESTDIR}" install
@@ -210,7 +213,7 @@ jobs:
           tar -czf "${ROOTDIR}/build/otp-${{ matrix.job.target }}.tar.gz" .
 
           cd "${OTP_SRC_DIR}"
-          make release
+          ./otp_build release
           cd ./release/*
           ./Install -sasl "$(pwd)"
           tar -czf "${ROOTDIR}/build/otp-release-${{ matrix.job.target }}.tar.gz" .

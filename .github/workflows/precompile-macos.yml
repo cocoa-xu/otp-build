@@ -194,15 +194,6 @@ jobs:
           if [ "${{ steps.build-check.outputs.with_wxwidgets }}" != "false" ]; then
             export WXWIDGETS_ARCHIVE="wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz"
             sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}"
-            if [ "${{ steps.build-check.outputs.with_wxwidgets }}" = "static"]; then
-              export WXIDGETS_LIBS="$(/usr/local/bin/wx-config --static --libs)"
-            else
-              export WXIDGETS_LIBS="$(/usr/local/bin/wx-config --libs)"
-            fi
-
-            echo "#!/bin/sh" | sudo tee /usr/local/bin/wx-config
-            echo "echo ${WXIDGETS_LIBS}" | sudo tee -a /usr/local/bin/wx-config
-            sudo chmod +x /usr/local/bin/wx-config
           fi
 
           tar -xzf "otp_src_${{ steps.build-check.outputs.version }}.tar.gz" -C "${OTP_SRC}" --strip-components=1

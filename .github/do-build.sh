@@ -1,68 +1,78 @@
 #!/bin/sh
 
-set -x
-
-GITHUB_REF_NAME=$1
-OPENSSL_VERSION=$2
-ARCH=$3
-TRIPLET=$4
-
-OTP_VERSION=${GITHUB_REF_NAME##v}
-OPENSSL_PERFIX_DIR="/work/openssl-${OPENSSL_VERSION}-${TRIPLET}"
-OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
+set -xe
 
 export DEBIAN_FRONTEND=noninteractive
 
-case $TRIPLET in
-    riscv64-linux-gnu )
-        apt-get update && apt-get install -y gcc g++ perl libncurses5-dev make
-        ;;
-    armv7l-linux-gnueabihf )
-        apt-get update && apt-get install -y libncurses-dev libssl-dev make cmake build-essential gcc g++ curl
-        ;;
-    *-linux-gnu )
-        yum install -y gcc gcc-c++ perl ncurses-devel make
-        ;;
-    *-linux-musl )
-        apk add gcc g++ perl ncurses-dev make
-        ;;
-    *)
-        echo "Unknown TRIPLET: ${TRIPLET}"
-        exit 1
-        ;;
-esac
-
-case $TRIPLET in
-    i686-* | i386-* | armv7l-* )
-        CONFIGURE_OPTIONS="--disable-year2038"
-        ;;
-    * )
-        CONFIGURE_OPTIONS=""
-        ;;
-esac
+OTP_VERSION=$1
+TARGET=$2
+ARCH=$3
+WITH_OPENSSL=$4
+OPENSSL_VERSION=$5
+WITH_WXWIDGETS=$6
+WXWIDGETS_VERSION=$7
 
 cd /work
+export ROOTDIR="$(pwd)"
+export OTP_SRC="otp_src_${OTP_VERSION}"
+export OTP_SRC_DIR="${ROOTDIR}/${OTP_SRC}"
+export DESTDIR="${ROOTDIR}/otp_${OTP_VERSION}"
+export RELDIR="${ROOTDIR}/rel/otp_${OTP_VERSION}"
 
-if [ "${OPENSSL_VERSION}" != "nil" ]; then
-    mkdir -p "${OPENSSL_PERFIX_DIR}" && \
-    tar -C "${OPENSSL_PERFIX_DIR}" -xzf "${OPENSSL_ARCHIVE}" ;
+rm -rf "${OTP_SRC_DIR}"
+mkdir -p "${OTP_SRC_DIR}"
+rm -rf "${DESTDIR}"
+mkdir -p "${DESTDIR}"
+rm -rf "${ROOTDIR}/build"
+mkdir -p "${ROOTDIR}/build"
+
+export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
+export OPENSSL_PERFIX_DIR="/work/openssl-${OPENSSL_VERSION}-${TRIPLET}"
+
+mkdir -p "${OPENSSL_PERFIX_DIR}"
+${SUDO} tar -C "${OPENSSL_PERFIX_DIR}" -xzf "${OPENSSL_ARCHIVE}"
+if [ "${WITH_OPENSSL}" != "static" ]; then
+  find "${OPENSSL_PERFIX_DIR}" -name "*.so"  -exec rm {} \;
 fi
 
-rm -rf "otp_src_${OTP_VERSION}" && \
-    mkdir -p "otp_src_${OTP_VERSION}" && \
-    tar -xzf "otp_src_${GITHUB_REF_NAME}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1 && \
-    cd "otp_src_${OTP_VERSION}" && \
-    if [ "${OPENSSL_VERSION}" != "nil" ]; then
-        ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib ${CONFIGURE_OPTIONS} ;
-    else
-        ./configure --without-javac --disable-dynamic-ssl-lib ${CONFIGURE_OPTIONS} ;
-    fi && \
-    make -j"$(nproc)" && \
-    export DESTDIR="$(pwd)/otp_${OTP_VERSION}" && \
-    make DESTDIR="${DESTDIR}" install && \
-    cd "${DESTDIR}/usr/local/lib/erlang" && \
-    { ./Install -sasl "$(pwd)" || true ; } && \
-    cd "${DESTDIR}" && \
-    tar -czf "/work/otp-${TRIPLET}.tar.gz" . && \
-    cd /work && \
-    rm -rf "otp_src_${OTP_VERSION}" "otp_${OTP_VERSION}" "${OPENSSL_PERFIX_DIR}"
+if [ "${WITH_WXWIDGETS}" != "false" ]; then
+  export WXWIDGETS_ARCHIVE="wxWidgets-${WITH_WXWIDGETS}-${TARGET}.tar.gz"
+  sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}" --strip-components=3
+
+  /usr/local/bin/wx-config --version
+fi
+
+case $TRIPLET in
+  i686-* | i386-* | armv7l-* )
+    CONFIGURE_OPTIONS="--disable-year2038"
+    ;;
+  * )
+    CONFIGURE_OPTIONS=""
+    ;;
+esac
+
+tar -xzf "otp_src_${OTP_VERSION}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1
+cd "otp_src_${OTP_VERSION}"
+
+if [ "${OPENSSL_VERSION}" != "nil" ]; then
+  ./otp_build configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib ${CONFIGURE_OPTIONS} ;
+else
+  ./otp_build configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib ${CONFIGURE_OPTIONS} ;
+fi
+
+rm -rf "${RELDIR}"
+./otp_build boot -a
+./otp_build release -a "${RELDIR}"
+cd "${RELDIR}"
+./Install -sasl "$(pwd)"
+tar -czf "${ROOTDIR}/build/otp-release-${TARGET}.tar.gz" .
+
+cd "${OTP_SRC_DIR}"
+make -j"$(nproc)"
+make DESTDIR="${DESTDIR}" install
+cd "${DESTDIR}"
+tar -czf "${ROOTDIR}/build/otp-${TARGET}.tar.gz" .
+
+cd "${ROOTDIR}/build"
+sha256sum "otp-${TARGET}.tar.gz" | tee "otp-${TARGET}.tar.gz.sha256"
+sha256sum "otp-release-${TARGET}.tar.gz" | tee "otp-release-${TARGET}.tar.gz.sha256"

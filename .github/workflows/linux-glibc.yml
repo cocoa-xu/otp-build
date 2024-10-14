@@ -1,0 +1,259 @@
+name: linux-glibc
+
+on:
+  workflow_dispatch:
+    inputs:
+      otp_verison:
+        description: 'OTP Version (X.Y.Z)'
+        required: true
+      openssl:
+        description: 'use OpenSSL'
+        required: false
+        default: 'static'
+        type: choice
+        options:
+          - static
+          - shared
+      openssl_version:
+        description: 'OpenSSL Version'
+        required: false
+        default: '3.3.0'
+      wxwidgets:
+        description: 'use wxWidgets'
+        required: false
+        default: 'static'
+        type: choice
+        options:
+          - static
+          - shared
+          - false
+      wxwidgets_version:
+        description: 'wxWidgets Version'
+        required: false
+        default: '3.2.6'
+      build_aarch64:
+        description: 'Build aarch64'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_x86_64:
+        description: 'Build x86_64'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_armv7l:
+        description: 'Build armv7l'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_riscv64:
+        description: 'Build riscv64'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_ppc64le:
+        description: 'Build ppc64le'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_s390x:
+        description: 'Build s390x'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  linux-gnu:
+    runs-on: ${{ matrix.job.runs-on }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.otp_verison }}-${{ matrix.job.target }}
+      cancel-in-progress: true
+    env:
+      DEFAULT_OPENSSL_VERSION: "3.3.0"
+      DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
+      DEFAULT_WXWIDGETS_VERSION: "3.2.6"
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { target: "aarch64-linux-gnu", runs-on: "ubuntu-latest", arch: "aarch64", image: "ubuntu:20.04", platform: "linux/aarch64" }
+          - { target: "x86_64-linux-gnu", runs-on: "ubuntu:latest", arch: "x86_64", image: "ubuntu:20.04", platform: "linux/amd64" }
+          - { target: "armv7l-linux-gnueabihf", runs-on: "ubuntu:latest", arch: "armv7l", image: "ubuntu:20.04", platform: "linux/arm/v7" }
+          - { target: "riscv64-linux-gnu", runs-on: "ubuntu-latest", arch: "riscv64", image: "ubuntu:20.04", platform: "linux/riscv64" }
+          - { target: "ppc64le-linux-gnu", runs-on: "ubuntu-latest", arch: "ppc64le", image: "ubuntu:20.04", platform: "linux/ppc64le" }
+          - { target: "s390x-linux-gnu", runs-on: "ubuntu-latest", arch: "s390x", image: "ubuntu:20.04", platform: "linux/s390x" }
+
+    name: ${{ matrix.job.target }}
+
+    steps:
+      - name: Build Check
+        id: build-check
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "build=true" >> $GITHUB_OUTPUT
+            
+            export OTP_VERSION_V=${GITHUB_REF##*/v}
+
+            echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
+            echo "wxwidgets_version=${{ env.DEFAULT_WXWIDGETS_VERSION }}" >> $GITHUB_OUTPUT
+            echo "with_openssl=static" >> $GITHUB_OUTPUT
+            echo "openssl_version=${{ env.DEFAULT_OPENSSL_VERSION }}" >> $GITHUB_OUTPUT
+          else
+            if [ "${{ matrix.job.target }}" == "aarch64-linux-gnu" ]; then
+              echo "build=${{ inputs.build_aarch64 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.job.target }}" == "x86_64-linux-gnu" ]; then
+              echo "build=${{ inputs.build_x86_64 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.job.target }}" == "armv7l-linux-gnueabihf" ]; then
+              echo "build=${{ inputs.build_armv7l }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.job.target }}" == "riscv64-linux-gnu" ]; then
+              echo "build=${{ inputs.build_riscv64 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.job.target }}" == "ppc64le-linux-gnu" ]; then
+              echo "build=${{ inputs.build_ppc64le }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.job.target }}" == "s390x-linux-gnu" ]; then
+              echo "build=${{ inputs.build_s390x }}" >> $GITHUB_OUTPUT
+            fi
+
+            export OTP_VERSION_V=${{ inputs.otp_verison }}
+
+            echo "with_wxwidgets=${{ inputs.wxwidgets }}" >> $GITHUB_OUTPUT
+            echo "wxwidgets_version=${{ inputs.wxwidgets_version }}" >> $GITHUB_OUTPUT
+            echo "with_openssl=${{ inputs.openssl }}" >> $GITHUB_OUTPUT
+            echo "openssl_version=${{ inputs.openssl_version }}" >> $GITHUB_OUTPUT
+          fi
+
+          export OTP_VERSION="${OTP_VERSION_V#v}"
+          echo "version=${OTP_VERSION}" >> $GITHUB_OUTPUT
+          echo "major=${OTP_MAJOR_VER}" >> $GITHUB_OUTPUT
+          if [ "${OTP_MAJOR_VER}" -lt "25" ]; then
+            echo "lte24=true" >> $GITHUB_OUTPUT
+          else
+            echo "lte24=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout
+        if: steps.build-check.outputs.build == 'true'
+        uses: actions/checkout@v4
+
+      - name: Cache OTP Source Code
+        if: steps.build-check.outputs.build == 'true'
+        id: cache-otp
+        uses: actions/cache@v4
+        with:
+          key: otp-${{ steps.build-check.outputs.version }}
+          path: |
+            ./otp_src_${{ steps.build-check.outputs.version }}.tar.gz
+
+      - name: Download OTP Source Code
+        if: steps.build-check.outputs.build == 'true' && steps.cache-otp.outputs.cache-hit != 'true'
+        run: |
+          export OTP_VERSION=${{ steps.build-check.outputs.version }}
+          export OTP_SRC_FILENAME="otp_src_${OTP_VERSION}.tar.gz"
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/${OTP_SRC_FILENAME}" -o "${OTP_SRC_FILENAME}" || \
+          { echo "${OTP_SRC_FILENAME} is not released yet"; exit 1; }
+
+      - name: Cache Precompiled OpenSSL
+        if: steps.build-check.outputs.build == 'true'
+        id: cache-openssl
+        uses: actions/cache@v4
+        with:
+          key: openssl-${{ steps.build-check.outputs.openssl_version }}-${{ matrix.job.target }}
+          path: |
+            ./openssl-${{ matrix.job.target }}.tar.gz
+
+      - name: Download Precompiled OpenSSL
+        if: steps.build-check.outputs.build == 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
+        run: |
+          export OPENSSL_FILENAME="openssl-${{ matrix.job.target }}.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}" -o "${OPENSSL_FILENAME}"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}.sha256" -o "${OPENSSL_FILENAME}.sha256"
+          shasum -c "${OTP_SRC_FILENAME}.sha256"
+
+      - name: Cache Precompiled wxWidgets
+        if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false'
+        id: cache-wxwidgets
+        uses: actions/cache@v4
+        with:
+          key: wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ steps.build-check.outputs.wxwidgets_version }}-${{ matrix.job.target }}
+          path: |
+            ./wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz
+
+      - name: Download Precompiled wxWidgets
+        if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false' && steps.cache-wxwidgets.outputs.cache-hit != 'true'
+        run: |
+          export WXWIDGETS_FILENAME="wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/wxWidgets-build/releases/download/v${{ steps.build-check.outputs.wxwidgets_version }}/${WXWIDGETS_FILENAME}" -o "${WXWIDGETS_FILENAME}"
+          curl -fSL "https://github.com/cocoa-xu/wxWidgets-build/releases/download/v${{ steps.build-check.outputs.wxwidgets_version }}/${WXWIDGETS_FILENAME}.sha256" -o "${WXWIDGETS_FILENAME}.sha256"
+          shasum -c "${WXWIDGETS_FILENAME}.sha256"
+
+      - name: Pull docker image
+        if: steps.build-check.outputs.build == 'true'
+        run: |
+          sudo docker pull --platform="${{ matrix.job.platform }}" "${{ matrix.job.image }}"
+          if [ "${{ matrix.job.arch }}" != "$(uname -m)" ]; then
+            sudo apt update
+            sudo apt install -y binfmt-support qemu-user-static
+          fi
+
+      - name: Compile OTP
+        run: |
+          cp .github/docker-build.sh ./
+          cp .github/install-deps-linux-glibc.sh ./install-deps.sh
+          cp .github/do-build.sh ./
+
+          export DOCKER_PLATFORM="${{ matrix.job.platform }}"
+          export DOCKER_IMAGE="${{ steps.build-check.outputs.image }}"
+          export OTP_VERSION="${{ steps.build-check.outputs.version }}"
+          export TARGET="${{ matrix.job.target }}"
+          export ARCH="${{ matrix.job.arch }}"
+          export WITH_OPENSSL="${{ steps.build-check.outputs.with_openssl }}"
+          export OPENSSL_VERSION="${{ steps.build-check.outputs.openssl_version }}"
+          export WITH_WXWIDGETS="${{ steps.build-check.outputs.with_wxwidgets }}"
+          export WXWIDGETS_VERSION="${{ steps.build-check.outputs.wxwidgets_version }}"
+
+          bash ./docker-build.sh "${DOCKER_PLATFORM}" "${DOCKER_IMAGE}" \
+            "${OTP_VERSION}" "${TARGET}" "${ARCH}" \
+            "${WITH_OPENSSL}" "${OPENSSL_VERSION}" \
+            "${WITH_WXWIDGETS}" "${WXWIDGETS_VERSION}"
+
+      - uses: softprops/action-gh-release@v2
+        if: steps.build-check.outputs.build == 'true'
+        with:
+          tag_name: v${{ steps.build-check.outputs.version }}
+          name: v${{ steps.build-check.outputs.version }}
+          files: |
+            build/*.tar.gz
+            build/*.sha256

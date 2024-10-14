@@ -185,8 +185,8 @@ jobs:
         run: |
           export OPENSSL_FILENAME="openssl-${{ matrix.job.target }}.tar.gz"
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}" -o "${OPENSSL_FILENAME}"
-          # curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}.sha256" -o "${OPENSSL_FILENAME}.sha256"
-          # shasum -c "${OTP_SRC_FILENAME}.sha256"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}.sha256" -o "${OPENSSL_FILENAME}.sha256"
+          shasum -c "${OTP_SRC_FILENAME}.sha256"
 
       - name: Cache Precompiled wxWidgets
         if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false'

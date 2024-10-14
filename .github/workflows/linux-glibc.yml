@@ -18,15 +18,6 @@ on:
         description: 'OpenSSL Version'
         required: false
         default: '3.3.0'
-      wxwidgets:
-        description: 'use wxWidgets'
-        required: false
-        default: 'static'
-        type: choice
-        options:
-          - static
-          - shared
-          - false
       wxwidgets_version:
         description: 'wxWidgets Version'
         required: false
@@ -149,7 +140,7 @@ jobs:
 
             export OTP_VERSION_V=${{ inputs.otp_verison }}
 
-            echo "with_wxwidgets=${{ inputs.wxwidgets }}" >> $GITHUB_OUTPUT
+            echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
             echo "wxwidgets_version=${{ inputs.wxwidgets_version }}" >> $GITHUB_OUTPUT
             echo "with_openssl=${{ inputs.openssl }}" >> $GITHUB_OUTPUT
             echo "openssl_version=${{ inputs.openssl_version }}" >> $GITHUB_OUTPUT

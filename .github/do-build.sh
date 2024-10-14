@@ -26,8 +26,8 @@ mkdir -p "${DESTDIR}"
 rm -rf "${ROOTDIR}/build"
 mkdir -p "${ROOTDIR}/build"
 
-export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
-export OPENSSL_PERFIX_DIR="/work/openssl-${OPENSSL_VERSION}-${TRIPLET}"
+export OPENSSL_ARCHIVE="openssl-${TRIPLET}.tar.gz"
+export OPENSSL_PERFIX_DIR="/work/openssl-${TRIPLET}"
 
 mkdir -p "${OPENSSL_PERFIX_DIR}"
 ${SUDO} tar -C "${OPENSSL_PERFIX_DIR}" -xzf "${OPENSSL_ARCHIVE}"

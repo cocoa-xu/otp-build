@@ -92,8 +92,8 @@ jobs:
       matrix:
         job:
           - { target: "aarch64-linux-gnu", runs-on: "ubuntu-latest", arch: "aarch64", image: "ubuntu:20.04", platform: "linux/aarch64" }
-          - { target: "x86_64-linux-gnu", runs-on: "ubuntu:latest", arch: "x86_64", image: "ubuntu:20.04", platform: "linux/amd64" }
-          - { target: "armv7l-linux-gnueabihf", runs-on: "ubuntu:latest", arch: "armv7l", image: "ubuntu:20.04", platform: "linux/arm/v7" }
+          - { target: "x86_64-linux-gnu", runs-on: "ubuntu-latest", arch: "x86_64", image: "ubuntu:20.04", platform: "linux/amd64" }
+          - { target: "armv7l-linux-gnueabihf", runs-on: "ubuntu-latest", arch: "armv7l", image: "ubuntu:20.04", platform: "linux/arm/v7" }
           - { target: "riscv64-linux-gnu", runs-on: "ubuntu-latest", arch: "riscv64", image: "ubuntu:20.04", platform: "linux/riscv64" }
           - { target: "ppc64le-linux-gnu", runs-on: "ubuntu-latest", arch: "ppc64le", image: "ubuntu:20.04", platform: "linux/ppc64le" }
           - { target: "s390x-linux-gnu", runs-on: "ubuntu-latest", arch: "s390x", image: "ubuntu:20.04", platform: "linux/s390x" }
@@ -138,7 +138,7 @@ jobs:
               echo "build=${{ inputs.build_s390x }}" >> $GITHUB_OUTPUT
             fi
 
-            export OTP_VERSION_V=${{ inputs.otp_verison }}
+            export OTP_VERSION_V="${{ inputs.otp_verison }}"
 
             echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
             echo "wxwidgets_version=${{ inputs.wxwidgets_version }}" >> $GITHUB_OUTPUT

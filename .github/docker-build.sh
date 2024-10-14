@@ -14,5 +14,5 @@ WXWIDGETS_VERSION=$9
 
 sudo docker run --privileged --network=host --rm \
   --platform="${DOCKER_PLATFORM}" \
-  -v $(pwd):/work "${DOCKER_IMAGE}" \
+  -v "$(pwd)":/work "${DOCKER_IMAGE}" \
   sh -c "chmod a+x /work/install-deps.sh && /bin/sh /work/install-deps.sh && chmod a+x /work/do-build.sh && /work/do-build.sh ${OTP_VERSION} ${TARGET} ${ARCH} ${WITH_OPENSSL} ${OPENSSL_VERSION} ${WITH_WXWIDGETS} ${WXWIDGETS_VERSION}"

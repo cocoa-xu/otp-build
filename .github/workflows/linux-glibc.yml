@@ -215,6 +215,7 @@ jobs:
           fi
 
       - name: Compile OTP
+        if: steps.build-check.outputs.build == 'true'
         run: |
           cp .github/docker-build.sh ./
           cp .github/install-deps-linux-glibc.sh ./install-deps.sh

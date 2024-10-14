@@ -149,11 +149,6 @@ jobs:
           export OTP_VERSION="${OTP_VERSION_V#v}"
           echo "version=${OTP_VERSION}" >> $GITHUB_OUTPUT
           echo "major=${OTP_MAJOR_VER}" >> $GITHUB_OUTPUT
-          if [ "${OTP_MAJOR_VER}" -lt "25" ]; then
-            echo "lte24=true" >> $GITHUB_OUTPUT
-          else
-            echo "lte24=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Checkout
         if: steps.build-check.outputs.build == 'true'

@@ -4,6 +4,12 @@ set -xe
 
 export DEBIAN_FRONTEND=noninteractive
 
+if [ -z "$(which sudo)" ]; then
+  export SUDO="" ;
+else
+  export SUDO="sudo" ;
+fi
+
 OTP_VERSION=$1
 TARGET=$2
 ARCH=$3
@@ -37,7 +43,7 @@ fi
 
 if [ "${WITH_WXWIDGETS}" != "false" ]; then
   export WXWIDGETS_ARCHIVE="wxWidgets-${WITH_WXWIDGETS}-${TARGET}.tar.gz"
-  sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}" --strip-components=3
+  ${SUDO} tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}" --strip-components=3
 
   /usr/local/bin/wx-config --version
 fi

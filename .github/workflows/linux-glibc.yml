@@ -197,7 +197,7 @@ jobs:
         with:
           key: wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ steps.build-check.outputs.wxwidgets_version }}-${{ matrix.job.target }}
           path: |
-            ./wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz
+            ./wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz
 
       - name: Download Precompiled wxWidgets
         if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false' && steps.cache-wxwidgets.outputs.cache-hit != 'true'

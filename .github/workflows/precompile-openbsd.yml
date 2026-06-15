@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23') || startsWith(inputs.otp_version, 'v24') || startsWith(inputs.otp_version, 'v23')

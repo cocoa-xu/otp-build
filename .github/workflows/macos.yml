@@ -106,7 +106,7 @@ jobs:
 
       - name: Checkout
         if: steps.build-check.outputs.build == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Cache OTP Source Code
         if: steps.build-check.outputs.build == 'true'

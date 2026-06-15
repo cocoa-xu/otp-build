@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         job:
-          - { major: "7", minor: "6" }
+          - { major: "7", minor: "7" }
       fail-fast: false
 
     name: x86_64-unknown-openbsd

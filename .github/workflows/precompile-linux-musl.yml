@@ -1,12 +1,57 @@
 name: precompile-linux-musl
 
 on:
+  workflow_dispatch:
+    inputs:
+      otp_version:
+        description: 'OTP Version (X.Y.Z)'
+        required: true
+      openssl:
+        description: 'use OpenSSL'
+        required: false
+        default: 'static'
+        type: choice
+        options:
+          - static
+          - shared
+      build_x86_64:
+        description: 'Build x86_64'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_i386:
+        description: 'Build i386'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_ppc64le:
+        description: 'Build ppc64le'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      build_s390x:
+        description: 'Build s390x'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
   push:
     tags:
       - "v*"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.otp_version }}
   cancel-in-progress: true
 
 permissions:
@@ -16,8 +61,8 @@ jobs:
   linux-musl:
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.5.0"
-      OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
+      DEFAULT_OPENSSL_VERSION: "3.5.0"
+      DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
     strategy:
       matrix:
         arch: [x86_64, i386, ppc64le, s390x]
@@ -26,90 +71,135 @@ jobs:
     name: ${{ matrix.arch }}-linux-musl
 
     steps:
+      - name: Build Check
+        id: build-check
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "build=true" >> $GITHUB_OUTPUT
+            export OTP_VERSION_V=${GITHUB_REF##*/v}
+            echo "with_openssl=static" >> $GITHUB_OUTPUT
+          else
+            if [ "${{ matrix.arch }}" == "x86_64" ]; then
+              echo "build=${{ inputs.build_x86_64 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.arch }}" == "i386" ]; then
+              echo "build=${{ inputs.build_i386 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.arch }}" == "ppc64le" ]; then
+              echo "build=${{ inputs.build_ppc64le }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.arch }}" == "s390x" ]; then
+              echo "build=${{ inputs.build_s390x }}" >> $GITHUB_OUTPUT
+            fi
+
+            export OTP_VERSION_V="${{ inputs.otp_version }}"
+            echo "with_openssl=${{ inputs.openssl }}" >> $GITHUB_OUTPUT
+          fi
+
+          export OTP_VERSION="${OTP_VERSION_V#v}"
+          echo "version=${OTP_VERSION}" >> $GITHUB_OUTPUT
+
+          echo "with_wxwidgets=false" >> $GITHUB_OUTPUT
+          echo "wxwidgets_version=nil" >> $GITHUB_OUTPUT
+
+          case "${OTP_VERSION}" in
+            24.* | 23.*)
+              echo "openssl_version=${{ env.DEFAULT_OPENSSL_VERSION_OTP24 }}" >> $GITHUB_OUTPUT
+              echo "image=alpine:latest" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "openssl_version=${{ env.DEFAULT_OPENSSL_VERSION }}" >> $GITHUB_OUTPUT
+              echo "image=alpine:edge" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
       - name: Checkout
+        if: steps.build-check.outputs.build == 'true'
         uses: actions/checkout@v5
 
-      - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')
-        id: cache-openssl-otp24
-        uses: actions/cache@v4
-        with:
-          key: openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-musl
-          path: |
-            ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-musl.tar.gz
-
-      - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: (startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
-        run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-${{ matrix.arch }}-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-${{ matrix.arch }}-linux-musl.tar.gz"
-
       - name: Cache Precompiled OpenSSL
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23')"
+        if: steps.build-check.outputs.build == 'true'
         id: cache-openssl
         uses: actions/cache@v4
         with:
-          key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl
+          key: openssl-${{ steps.build-check.outputs.openssl_version }}-${{ matrix.arch }}-linux-musl
           path: |
-            ./openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl.tar.gz
+            ./openssl-${{ matrix.arch }}-linux-musl.tar.gz
 
       - name: Download Precompiled OpenSSL
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
+        if: steps.build-check.outputs.build == 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.arch }}-linux-musl.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.arch }}-linux-musl.tar.gz"
+          export OPENSSL_FILENAME="openssl-${{ matrix.arch }}-linux-musl.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}" -o "${OPENSSL_FILENAME}"
 
       - name: Cache OTP Source Code
+        if: steps.build-check.outputs.build == 'true'
         id: cache-otp
         uses: actions/cache@v4
         with:
-          key: otp-${{ github.ref_name }}
+          key: otp-${{ steps.build-check.outputs.version }}
           path: |
-            ./otp_src_${{ github.ref_name }}.tar.gz
+            ./otp_src_${{ steps.build-check.outputs.version }}.tar.gz
 
       - name: Download OTP Source Code
-        if: steps.cache-otp.outputs.cache-hit != 'true'
+        if: steps.build-check.outputs.build == 'true' && steps.cache-otp.outputs.cache-hit != 'true'
         run: |
-          export OTP_VERSION=${GITHUB_REF##*/v}
-          echo "OTP_VERSION: $OTP_VERSION"
-          echo "github.ref_name: ${{ github.ref_name }}"
-          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz" || \
-          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
+          export OTP_VERSION=${{ steps.build-check.outputs.version }}
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" || \
+          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz"
 
       - name: Pull docker image
+        if: steps.build-check.outputs.build == 'true'
         run: |
-          sudo docker pull --platform=linux/${{ matrix.arch }} alpine:latest
+          sudo docker pull --platform=linux/${{ matrix.arch }} ${{ steps.build-check.outputs.image }}
 
       - name: Install binfmt
+        if: steps.build-check.outputs.build == 'true'
         run: |
           sudo apt update
           sudo apt install -y binfmt-support qemu-user-static
 
       - name: Precompile
+        if: steps.build-check.outputs.build == 'true'
         run: |
           cp .github/script-to-build-musl.sh ./
           cp .github/do-build.sh ./
 
-          case "${{ github.ref_name }}" in
-            v24.* | v23.*)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}" "${{ matrix.arch }}" "alpine:latest"
-              ;;
-            *)
-              bash ./script-to-build-musl.sh "${{ github.ref_name }}" "${{ env.OPENSSL_VERSION }}" "${{ matrix.arch }}" "alpine:edge"
-              ;;
-          esac
+          bash ./script-to-build-musl.sh \
+            "${{ steps.build-check.outputs.version }}" \
+            "${{ matrix.arch }}" \
+            "${{ steps.build-check.outputs.image }}" \
+            "${{ steps.build-check.outputs.with_openssl }}" \
+            "${{ steps.build-check.outputs.openssl_version }}" \
+            "${{ steps.build-check.outputs.with_wxwidgets }}" \
+            "${{ steps.build-check.outputs.wxwidgets_version }}"
 
       - uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+        if: steps.build-check.outputs.build == 'true'
         with:
+          tag_name: v${{ steps.build-check.outputs.version }}
+          name: v${{ steps.build-check.outputs.version }}
           files: |
-            otp-*.tar.gz
+            build/*.tar.gz
+            build/*.sha256
 
   deploy-linux-musl:
     runs-on: ubuntu-latest
     needs: linux-musl
     steps:
-      - name: deploy
+      - name: deploy by tag
         if: startsWith(github.ref, 'refs/tags/') && github.repository == 'cocoa-xu/otp-build'
         env:
           DEPLOY_LINUX_MUSL_HOOK_URL: ${{ secrets.DEPLOY_LINUX_MUSL_HOOK_URL }}
         run: |
           curl -sS --no-progress-meter "${DEPLOY_LINUX_MUSL_HOOK_URL}${{ github.ref_name }}"
+
+      - name: deploy by workflow_dispatch
+        if: startsWith(inputs.otp_version, 'v') && github.repository == 'cocoa-xu/otp-build'
+        env:
+          DEPLOY_LINUX_MUSL_HOOK_URL: ${{ secrets.DEPLOY_LINUX_MUSL_HOOK_URL }}
+        run: |
+          curl -sS --no-progress-meter "${DEPLOY_LINUX_MUSL_HOOK_URL}${{ inputs.otp_version }}"

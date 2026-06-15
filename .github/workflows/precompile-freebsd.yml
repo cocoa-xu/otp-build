@@ -74,7 +74,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: steps.build-check.outputs.build == 'true' && (startsWith(github.ref, 'refs/tags/v24') || startsWith(inputs.otp_version, 'v24'))
+        if: steps.build-check.outputs.build == 'true' && startsWith(steps.build-check.outputs.version, '24.')
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
@@ -83,12 +83,12 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-freebsd.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: steps.build-check.outputs.build == 'true' && (startsWith(github.ref, 'refs/tags/v24') || startsWith(inputs.otp_version, 'v24')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
+        if: steps.build-check.outputs.build == 'true' && startsWith(steps.build-check.outputs.version, '24.') && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-x86_64-unknown-freebsd.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-freebsd.tar.gz"
 
       - name: Cache Precompiled OpenSSL for OTP 25 and above
-        if: "steps.build-check.outputs.build == 'true' && (!startsWith(github.ref, 'refs/tags/v24') && !startsWith(inputs.otp_version, 'v24'))"
+        if: "steps.build-check.outputs.build == 'true' && !startsWith(steps.build-check.outputs.version, '24.')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -97,7 +97,7 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.job.arch }}-unknown-freebsd.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 25 and above
-        if: "steps.build-check.outputs.build == 'true' && !startsWith(github.ref, 'refs/tags/v24') && !startsWith(inputs.otp_version, 'v24') && steps.cache-openssl.outputs.cache-hit != 'true'"
+        if: "steps.build-check.outputs.build == 'true' && !startsWith(steps.build-check.outputs.version, '24.') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-${{ matrix.job.arch }}-unknown-freebsd.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.job.arch }}-unknown-freebsd.tar.gz"
 

@@ -5,6 +5,14 @@ on:
     inputs:
       otp_version:
         required: true
+      build_x86_64:
+        description: 'Build x86_64'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
   push:
     tags:
       - "v*"
@@ -31,11 +39,26 @@ jobs:
     name: x86_64-unknown-netbsd
 
     steps:
+      - name: Build Check
+        id: build-check
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "build=true" >> $GITHUB_OUTPUT
+            export BUILD_VERSION_V="v${GITHUB_REF##*/v}"
+          else
+            echo "build=${{ inputs.build_x86_64 }}" >> $GITHUB_OUTPUT
+            export BUILD_VERSION_V="${{ inputs.otp_version }}"
+          fi
+
+          export BUILD_VERSION="${BUILD_VERSION_V#v}"
+          echo "version=${BUILD_VERSION}" >> $GITHUB_OUTPUT
+
       - name: Checkout
+        if: steps.build-check.outputs.build == 'true'
         uses: actions/checkout@v5
 
       - name: Cache Precompiled OpenSSL for OTP 24 and below
-        if: startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')
+        if: steps.build-check.outputs.build == 'true' && (startsWith(steps.build-check.outputs.version, '24.') || startsWith(steps.build-check.outputs.version, '23.'))
         id: cache-openssl-otp24
         uses: actions/cache@v4
         with:
@@ -44,12 +67,12 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-netbsd.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 24 and below
-        if: (startsWith(github.ref, 'refs/tags/v24') || startsWith(github.ref, 'refs/tags/v23')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
+        if: steps.build-check.outputs.build == 'true' && (startsWith(steps.build-check.outputs.version, '24.') || startsWith(steps.build-check.outputs.version, '23.')) && steps.cache-openssl-otp24.outputs.cache-hit != 'true'
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-x86_64-unknown-netbsd.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-netbsd.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION_OTP_24_AND_BELOW}/openssl-x86_64-unknown-netbsd${{ matrix.job.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-netbsd.tar.gz"
 
       - name: Cache Precompiled OpenSSL for OTP 25 and above
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && !startsWith(inputs.otp_version, 'v24') && !startsWith(inputs.otp_version, 'refs/tags/v23')"
+        if: "steps.build-check.outputs.build == 'true' && !startsWith(steps.build-check.outputs.version, '24.') && !startsWith(steps.build-check.outputs.version, '23.')"
         id: cache-openssl
         uses: actions/cache@v4
         with:
@@ -58,48 +81,28 @@ jobs:
             ./openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-netbsd.tar.gz
 
       - name: Download Precompiled OpenSSL for OTP 25 and above
-        if: "!startsWith(github.ref, 'refs/tags/v24') && !startsWith(github.ref, 'refs/tags/v23') && !startsWith(inputs.otp_version, 'v24') && !startsWith(inputs.otp_version, 'v23') && steps.cache-openssl.outputs.cache-hit != 'true'"
+        if: "steps.build-check.outputs.build == 'true' && !startsWith(steps.build-check.outputs.version, '24.') && !startsWith(steps.build-check.outputs.version, '23.') && steps.cache-openssl.outputs.cache-hit != 'true'"
         run: |
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-unknown-netbsd.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-netbsd.tar.gz"
+          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${OPENSSL_VERSION}/openssl-x86_64-unknown-netbsd${{ matrix.job.major }}.tar.gz" -o "openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-netbsd.tar.gz"
 
-      - name: Cache OTP Source Code by Tag
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Cache OTP Source Code
+        if: steps.build-check.outputs.build == 'true'
         id: cache-otp
         uses: actions/cache@v4
         with:
-          key: otp-${{ github.ref_name }}
+          key: otp-${{ steps.build-check.outputs.version }}
           path: |
-            ./otp_src_${{ github.ref_name }}.tar.gz
+            ./otp_src_${{ steps.build-check.outputs.version }}.tar.gz
 
       - name: Download OTP Source Code
-        if: startsWith(github.ref, 'refs/tags/v') && steps.cache-otp.outputs.cache-hit != 'true'
+        if: steps.build-check.outputs.build == 'true' && steps.cache-otp.outputs.cache-hit != 'true'
         run: |
-          export OTP_VERSION=${GITHUB_REF##*/v}
-          echo "OTP_VERSION: $OTP_VERSION"
-          echo "github.ref_name: ${{ github.ref_name }}"
-          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz" || \
-          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${{ github.ref_name }}.tar.gz"
-
-      - name: Cache OTP Source Code from workflow_dispatch
-        if: startsWith(inputs.otp_version, 'v')
-        id: cache-otp-workflow_dispatch
-        uses: actions/cache@v4
-        with:
-          key: otp-${{ inputs.otp_version }}
-          path: |
-            ./otp_src_${{ inputs.otp_version }}.tar.gz
-
-      - name: Download OTP Source Code from workflow_dispatch
-        if: startsWith(inputs.otp_version, 'v') && steps.cache-otp-workflow_dispatch.outputs.cache-hit != 'true'
-        run: |
-          export OTP_VERSION=${{ inputs.otp_version }}
-          export OTP_VERSION=${OTP_VERSION##v}
-          echo "OTP_VERSION: $OTP_VERSION"
-          echo "inputs.otp_version: ${{ inputs.otp_version }}"
-          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${{ inputs.otp_version }}.tar.gz" || \
-          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${{ inputs.otp_version }}.tar.gz"
+          export OTP_VERSION=${{ steps.build-check.outputs.version }}
+          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz" || \
+          curl -fSL "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz" -o "otp_src_${OTP_VERSION}.tar.gz"
 
       - name: Compile in NetBSD
+        if: steps.build-check.outputs.build == 'true'
         id: compile-netbsd
         uses: vmactions/netbsd-vm@v1
         with:
@@ -112,13 +115,8 @@ jobs:
           run: |
             export TRIPLET=x86_64-unknown-netbsd
             export ROOT_DIR="$(pwd)"
-            export OTP_VERSION=${{ inputs.otp_version }}
-            export OTP_VERSION=${OTP_VERSION##v}
-            if [ -z "${OTP_VERSION}" ]; then
-              export OTP_VERSION=${GITHUB_REF##*/v}
-              echo "OTP_VERSION: $OTP_VERSION"
-            fi
-            
+            export OTP_VERSION=${{ steps.build-check.outputs.version }}
+
             case "${OTP_VERSION}" in
               24.* | 23.*)
                 export OPENSSL_PERFIX_DIR=/tmp/openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}
@@ -135,8 +133,8 @@ jobs:
             rm -f "${OPENSSL_ARCHIVE}"
             rm -rf otp_src_${OTP_VERSION}
             mkdir -p otp_src_${OTP_VERSION}
-            tar -xzf "otp_src_v${OTP_VERSION}.tar.gz" -C otp_src_${OTP_VERSION} --strip-components=1
-            rm -f "otp_src_v${OTP_VERSION}.tar.gz"
+            tar -xzf "otp_src_${OTP_VERSION}.tar.gz" -C otp_src_${OTP_VERSION} --strip-components=1
+            rm -f "otp_src_${OTP_VERSION}.tar.gz"
             cd "otp_src_${OTP_VERSION}"
 
             ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
@@ -155,16 +153,10 @@ jobs:
             ls -lah "${ROOT_DIR}"
 
       - uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: steps.build-check.outputs.build == 'true'
         with:
-          files: |
-            otp-*.tar.gz
-    
-      - uses: softprops/action-gh-release@v2
-        if: startsWith(inputs.otp_version, 'v')
-        with:
-          tag_name: ${{ github.event.inputs.otp_version }}
-          name: ${{ github.event.inputs.otp_version }}
+          tag_name: v${{ steps.build-check.outputs.version }}
+          name: v${{ steps.build-check.outputs.version }}
           files: |
             otp-*.tar.gz
 

@@ -61,7 +61,7 @@ jobs:
       matrix:
         job: 
           - { target: "arm64-apple-darwin", runs-on: "macos-14" }
-          - { target: "x86_64-apple-darwin", runs-on: "macos-13" }
+          - { target: "x86_64-apple-darwin", runs-on: "macos-15-intel" }
 
     name: ${{ matrix.job.target }}
 

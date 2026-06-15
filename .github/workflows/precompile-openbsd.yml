@@ -55,12 +55,12 @@ jobs:
 
       - name: Checkout
         if: steps.build-check.outputs.build == 'true'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: steps.build-check.outputs.build == 'true' && (startsWith(steps.build-check.outputs.version, '24.') || startsWith(steps.build-check.outputs.version, '23.'))
         id: cache-openssl-otp24
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: openssl-111-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-openbsd${{ matrix.job.major }}.${{ matrix.job.minor }}
           path: |
@@ -74,7 +74,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 25 and above
         if: "steps.build-check.outputs.build == 'true' && !startsWith(steps.build-check.outputs.version, '24.') && !startsWith(steps.build-check.outputs.version, '23.')"
         id: cache-openssl
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-x86_64-unknown-openbsd${{ matrix.job.major }}.${{ matrix.job.minor }}
           path: |
@@ -88,7 +88,7 @@ jobs:
       - name: Cache OTP Source Code
         if: steps.build-check.outputs.build == 'true'
         id: cache-otp
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: otp-${{ steps.build-check.outputs.version }}
           path: |
@@ -167,7 +167,7 @@ jobs:
         if: steps.build-check.outputs.build == 'true' && steps.check-outputs.outputs.has_tarball == 'false'
         uses: mxschmitt/action-tmate@v3
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         if: steps.build-check.outputs.build == 'true'
         with:
           tag_name: v${{ steps.build-check.outputs.version }}

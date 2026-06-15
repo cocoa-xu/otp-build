@@ -106,12 +106,12 @@ jobs:
 
       - name: Checkout
         if: steps.build-check.outputs.build == 'true'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Cache OTP Source Code
         if: steps.build-check.outputs.build == 'true'
         id: cache-otp
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: otp-${{ steps.build-check.outputs.version }}
           path: |
@@ -128,7 +128,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: steps.build-check.outputs.build == 'true'
         id: cache-openssl
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: precompiled-openssl-${{ steps.build-check.outputs.openssl_version }}-${{ matrix.job.target }}
           path: |
@@ -146,7 +146,7 @@ jobs:
       - name: Cache Precompiled wxWidgets
         if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false'
         id: cache-wxwidgets
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ steps.build-check.outputs.wxwidgets_version }}-${{ matrix.job.target }}
           path: |
@@ -222,7 +222,7 @@ jobs:
           shasum -a 256 otp-${{ matrix.job.target }}.tar.gz | tee otp-${{ matrix.job.target }}.tar.gz.sha256
           shasum -a 256 otp-release-${{ matrix.job.target }}.tar.gz | tee otp-release-${{ matrix.job.target }}.tar.gz.sha256
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         if: steps.build-check.outputs.build == 'true'
         with:
           tag_name: v${{ steps.build-check.outputs.version }}

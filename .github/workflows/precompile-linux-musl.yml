@@ -90,6 +90,14 @@ jobs:
           export OTP_VERSION="${OTP_VERSION_V#v}"
           echo "version=${OTP_VERSION}" >> $GITHUB_OUTPUT
 
+          # The prebuilt OpenSSL for 32-bit x86 is published under the i686
+          # triplet, while this matrix (and the released OTP artifact) use i386.
+          if [ "${{ matrix.arch }}" = "i386" ]; then
+            echo "openssl_arch=i686" >> $GITHUB_OUTPUT
+          else
+            echo "openssl_arch=${{ matrix.arch }}" >> $GITHUB_OUTPUT
+          fi
+
           echo "with_wxwidgets=false" >> $GITHUB_OUTPUT
           echo "wxwidgets_version=nil" >> $GITHUB_OUTPUT
 
@@ -120,8 +128,9 @@ jobs:
       - name: Download Precompiled OpenSSL
         if: steps.build-check.outputs.build == 'true' && steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
+          export OPENSSL_REMOTE="openssl-${{ steps.build-check.outputs.openssl_arch }}-linux-musl.tar.gz"
           export OPENSSL_FILENAME="openssl-${{ matrix.arch }}-linux-musl.tar.gz"
-          curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}" -o "${OPENSSL_FILENAME}"
+          curl -fSL --retry 5 --retry-delay 5 --retry-all-errors --connect-timeout 30 "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_REMOTE}" -o "${OPENSSL_FILENAME}"
 
       - name: Cache OTP Source Code
         if: steps.build-check.outputs.build == 'true'

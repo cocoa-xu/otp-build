@@ -15,13 +15,13 @@ permissions:
 
 jobs:
   cross-compile:
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       WSL_UBUNTU_VERSION: "20.04"
       WSL_UBUNTU_URL: "https://aka.ms/wslubuntu2004"
       LLVM_MINGW_VERSION: "20231128"
       NSIS_VERSION: "3.09"
-      OPENSSL_VERSION: "3.5.0"
+      OPENSSL_VERSION: "3.6.3"
     steps:
       - name: Enable WSL and Virtual Machine Platform
         run: |

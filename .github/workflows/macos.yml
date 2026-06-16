@@ -17,7 +17,7 @@ on:
       openssl_version:
         description: 'OpenSSL Version'
         required: false
-        default: '3.5.0'
+        default: '3.6.3'
       wxwidgets:
         description: 'use wxWidgets'
         required: false
@@ -30,15 +30,17 @@ on:
       wxwidgets_version:
         description: 'wxWidgets Version'
         required: false
-        default: '3.2.8'
+        default: '3.3.2'
       build_arm64:
         description: 'Build ARM64'
         required: false
-        default: 'true'
+        default: true
+        type: boolean
       build_x86_64:
         description: 'Build x86_64'
         required: false
-        default: 'true'
+        default: true
+        type: boolean
   push:
     tags:
       - "v*"
@@ -53,8 +55,8 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.otp_verison }}-${{ matrix.job.target }}
       cancel-in-progress: true
     env:
-      DEFAULT_WXWIDGETS_VERSION: "3.2.8"
-      DEFAULT_OPENSSL_VERSION: "3.5.0"
+      DEFAULT_WXWIDGETS_VERSION: "3.3.2"
+      DEFAULT_OPENSSL_VERSION: "3.6.3"
       DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
     strategy:
       fail-fast: false

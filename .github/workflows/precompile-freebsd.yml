@@ -8,19 +8,13 @@ on:
       build_aarch64:
         description: 'Build aarch64'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - true
-          - false
+        default: false
+        type: boolean
       build_x86_64:
         description: 'Build x86_64'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        default: true
+        type: boolean
   push:
     tags:
       - "v*"
@@ -37,7 +31,7 @@ jobs:
     if: "!startsWith(github.ref, 'refs/tags/v23')"
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.5.0"
+      OPENSSL_VERSION: "3.6.3"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
     strategy:
       fail-fast: false

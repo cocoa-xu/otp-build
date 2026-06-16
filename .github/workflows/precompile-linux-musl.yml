@@ -17,35 +17,23 @@ on:
       build_x86_64:
         description: 'Build x86_64'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        default: true
+        type: boolean
       build_i386:
         description: 'Build i386'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        default: true
+        type: boolean
       build_ppc64le:
         description: 'Build ppc64le'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        default: true
+        type: boolean
       build_s390x:
         description: 'Build s390x'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        default: true
+        type: boolean
   push:
     tags:
       - "v*"
@@ -61,7 +49,7 @@ jobs:
   linux-musl:
     runs-on: ubuntu-latest
     env:
-      DEFAULT_OPENSSL_VERSION: "3.5.0"
+      DEFAULT_OPENSSL_VERSION: "3.6.3"
       DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
     strategy:
       matrix:

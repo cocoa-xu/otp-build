@@ -196,6 +196,12 @@ jobs:
             export WXWIDGETS_ARCHIVE="wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz"
             sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}" --strip-components=3
 
+            # The prebuilt bin/wx-config is an absolute symlink into the
+            # wxWidgets-build CI workspace, which does not exist here. Re-point it
+            # at the extracted config script via a relative symlink.
+            WXCONFIG="$(ls /usr/local/lib/wx/config/ | head -n1)"
+            sudo ln -sf "../lib/wx/config/${WXCONFIG}" /usr/local/bin/wx-config
+
             /usr/local/bin/wx-config --version
           fi
 

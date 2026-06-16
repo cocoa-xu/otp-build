@@ -18,6 +18,12 @@ OPENSSL_VERSION=$5
 WITH_WXWIDGETS=$6
 WXWIDGETS_VERSION=$7
 
+case $TARGET in
+  *-linux-musl )
+    apk add --no-cache build-base perl ncurses-dev
+    ;;
+esac
+
 cd /work
 export ROOTDIR="$(pwd)"
 export OTP_SRC="otp_src_${OTP_VERSION}"

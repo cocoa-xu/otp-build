@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { fullversion: "13.2", major: "13", arch: "x86_64", target: "x86_64-unknown-freebsd" }
+          - { fullversion: "13.5", major: "13", arch: "x86_64", target: "x86_64-unknown-freebsd" }
 
     name: ${{ matrix.job.target }}
 

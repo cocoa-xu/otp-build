@@ -147,11 +147,14 @@ jobs:
             rm -f "otp_src_${OTP_VERSION}.tar.gz"
             cd "otp_src_${OTP_VERSION}"
 
+            export SRC_DIR="${ROOT_DIR}/otp_src_${OTP_VERSION}"
+            export DESTDIR="${SRC_DIR}/otp_${OTP_VERSION}"
+
             ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
-            gmake -j$(nproc)
-            gmake DESTDIR="$(pwd)/otp_${OTP_VERSION}" install
-            
-            cd "$(pwd)/otp_${OTP_VERSION}"
+            gmake -j$(sysctl -n hw.ncpu)
+            gmake DESTDIR="${DESTDIR}" install
+
+            cd "${DESTDIR}"
 
             tar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" . && cd "${ROOT_DIR}"
             sha256sum otp-${TRIPLET}.tar.gz | tee otp-${TRIPLET}.tar.gz.sha256

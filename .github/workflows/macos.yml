@@ -124,7 +124,7 @@ jobs:
         run: |
           export OTP_VERSION=${{ steps.build-check.outputs.version }}
           export OTP_SRC_FILENAME="otp_src_${OTP_VERSION}.tar.gz"
-          curl -fSL "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/${OTP_SRC_FILENAME}" -o "${OTP_SRC_FILENAME}" || \
+          curl -fSL --retry 5 --retry-delay 5 --retry-all-errors --connect-timeout 30 "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/${OTP_SRC_FILENAME}" -o "${OTP_SRC_FILENAME}" || \
           { echo "${OTP_SRC_FILENAME} is not released yet"; exit 1; }
 
       - name: Cache Precompiled OpenSSL

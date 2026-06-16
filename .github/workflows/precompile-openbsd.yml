@@ -112,44 +112,7 @@ jobs:
 
           run: |
             export TRIPLET=x86_64-unknown-openbsd
-            export ROOT_DIR="$(pwd)"
-            echo "ROOT_DIR: $ROOT_DIR"
-            export OTP_VERSION=${{ steps.build-check.outputs.version }}
-
-            case "${OTP_VERSION}" in
-              24.* | 23.*)
-                export OPENSSL_PERFIX_DIR=/tmp/openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}
-                export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION_OTP_24_AND_BELOW}-${TRIPLET}.tar.gz"
-                ;;
-              *)
-                export OPENSSL_PERFIX_DIR=/openssl-${OPENSSL_VERSION}-${TRIPLET}
-                export OPENSSL_ARCHIVE="openssl-${OPENSSL_VERSION}-${TRIPLET}.tar.gz"
-                ;;
-            esac
-
-            mkdir -p "${OPENSSL_PERFIX_DIR}"
-            tar xzf "${OPENSSL_ARCHIVE}" -C "${OPENSSL_PERFIX_DIR}"
-            rm -rf "otp_src_${OTP_VERSION}"
-            mkdir -p "otp_src_${OTP_VERSION}"
-            gtar xzf "otp_src_${OTP_VERSION}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1
-            rm -f "otp_src_${OTP_VERSION}.tar.gz"
-            cd "otp_src_${OTP_VERSION}"
-
-            export DESTDIR="${ROOT_DIR}/otp_src_${OTP_VERSION}/otp_${OTP_VERSION}"
-
-            ./configure --without-javac --with-ssl="${OPENSSL_PERFIX_DIR}" --disable-dynamic-ssl-lib
-            gmake -j$(getconf NPROCESSORS_ONLN)
-            echo "Install OTP to otp_${OTP_VERSION}"
-            gmake DESTDIR="${DESTDIR}" install
-            echo "Create tarball at ${ROOT_DIR}/otp-${TRIPLET}.tar.gz"
-            cd "${DESTDIR}"
-            gtar -czf "${ROOT_DIR}/otp-${TRIPLET}.tar.gz" .
-            cd ..
-            rm -rf "otp_${OTP_VERSION}"
-            cd "${ROOT_DIR}"
-            rm -rf "otp_src_${OTP_VERSION}"
-            rm -f "${OPENSSL_ARCHIVE}"
-            ls -lah "${ROOT_DIR}"
+            sh ./.github/build-bsd.sh openbsd "${TRIPLET}" "${{ steps.build-check.outputs.version }}"
 
       - name: check outputs
         if: steps.build-check.outputs.build == 'true'

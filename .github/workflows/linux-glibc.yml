@@ -32,6 +32,11 @@ on:
         required: false
         default: true
         type: boolean
+      build_i686:
+        description: 'Build i686'
+        required: false
+        default: true
+        type: boolean
       build_armv7l:
         description: 'Build armv7l'
         required: false
@@ -75,6 +80,7 @@ jobs:
         job:
           - { target: "aarch64-linux-gnu", runs-on: "ubuntu-latest", arch: "aarch64", image: "ubuntu:20.04", platform: "linux/aarch64" }
           - { target: "x86_64-linux-gnu", runs-on: "ubuntu-latest", arch: "x86_64", image: "ubuntu:20.04", platform: "linux/amd64" }
+          - { target: "i686-linux-gnu", runs-on: "ubuntu-latest", arch: "i686", image: "i386/debian:bookworm", platform: "linux/386" }
           - { target: "armv7l-linux-gnueabihf", runs-on: "ubuntu-latest", arch: "armv7l", image: "ubuntu:20.04", platform: "linux/arm/v7" }
           - { target: "riscv64-linux-gnu", runs-on: "ubuntu-latest", arch: "riscv64", image: "ubuntu:20.04", platform: "linux/riscv64" }
           - { target: "ppc64le-linux-gnu", runs-on: "ubuntu-latest", arch: "ppc64le", image: "ubuntu:20.04", platform: "linux/ppc64le" }
@@ -88,10 +94,14 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
             echo "build=true" >> $GITHUB_OUTPUT
-            
+
             export OTP_VERSION_V=${GITHUB_REF##*/v}
 
-            echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
+            if [ "${{ matrix.job.target }}" == "i686-linux-gnu" ]; then
+              echo "with_wxwidgets=false" >> $GITHUB_OUTPUT
+            else
+              echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
+            fi
             echo "wxwidgets_version=${{ env.DEFAULT_WXWIDGETS_VERSION }}" >> $GITHUB_OUTPUT
             echo "with_openssl=static" >> $GITHUB_OUTPUT
             echo "openssl_version=${{ env.DEFAULT_OPENSSL_VERSION }}" >> $GITHUB_OUTPUT
@@ -102,6 +112,10 @@ jobs:
 
             if [ "${{ matrix.job.target }}" == "x86_64-linux-gnu" ]; then
               echo "build=${{ inputs.build_x86_64 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.job.target }}" == "i686-linux-gnu" ]; then
+              echo "build=${{ inputs.build_i686 }}" >> $GITHUB_OUTPUT
             fi
 
             if [ "${{ matrix.job.target }}" == "armv7l-linux-gnueabihf" ]; then
@@ -122,7 +136,11 @@ jobs:
 
             export OTP_VERSION_V="${{ inputs.otp_verison }}"
 
-            echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
+            if [ "${{ matrix.job.target }}" == "i686-linux-gnu" ]; then
+              echo "with_wxwidgets=false" >> $GITHUB_OUTPUT
+            else
+              echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
+            fi
             echo "wxwidgets_version=${{ inputs.wxwidgets_version }}" >> $GITHUB_OUTPUT
             echo "with_openssl=${{ inputs.openssl }}" >> $GITHUB_OUTPUT
             echo "openssl_version=${{ inputs.openssl_version }}" >> $GITHUB_OUTPUT
@@ -202,7 +220,11 @@ jobs:
         if: steps.build-check.outputs.build == 'true'
         run: |
           cp .github/docker-build.sh ./
-          cp .github/install-deps-linux-glibc.sh ./install-deps.sh
+          if [ "${{ matrix.job.target }}" == "i686-linux-gnu" ]; then
+            cp .github/install-deps-linux-gnu-i686.sh ./install-deps.sh
+          else
+            cp .github/install-deps-linux-glibc.sh ./install-deps.sh
+          fi
           cp .github/do-build.sh ./
 
           export DOCKER_PLATFORM="${{ matrix.job.platform }}"

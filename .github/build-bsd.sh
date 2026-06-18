@@ -54,12 +54,18 @@ cd "${SRC_DIR}"
 
 # OTP 29's tty NIF (nifs/common/prim_tty_nif.c) requires ncurses (NCURSES_CONST,
 # terminfo helpers) which NetBSD base lacks. pkgsrc installs ncurses + pkgconf
-# under /usr/pkg, so point pkg-config and the toolchain there. Scoped to NetBSD
-# and purely additive, so FreeBSD/OpenBSD and older OTP are unaffected.
+# under /usr/pkg, so point pkg-config and the toolchain there. Gated to OTP >= 29
+# because the -Wl,-R rpath flag is compiler-driver syntax, but OTP 27/28 link
+# some drivers (e.g. runtime_tools) by invoking ld directly, which rejects
+# -Wl,...; those releases also predate the ncurses requirement entirely.
 if [ "${OS}" = "netbsd" ]; then
-  export PKG_CONFIG_PATH="/usr/pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
-  export CPPFLAGS="-I/usr/pkg/include${CPPFLAGS:+ ${CPPFLAGS}}"
-  export LDFLAGS="-L/usr/pkg/lib -Wl,-R/usr/pkg/lib${LDFLAGS:+ ${LDFLAGS}}"
+  case "${OTP_VERSION}" in
+    29.* | 3[0-9].*)
+      export PKG_CONFIG_PATH="/usr/pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
+      export CPPFLAGS="-I/usr/pkg/include${CPPFLAGS:+ ${CPPFLAGS}}"
+      export LDFLAGS="-L/usr/pkg/lib -Wl,-R/usr/pkg/lib${LDFLAGS:+ ${LDFLAGS}}"
+      ;;
+  esac
 fi
 
 ./configure --without-javac --with-ssl="${OPENSSL_PREFIX_DIR}" --disable-dynamic-ssl-lib

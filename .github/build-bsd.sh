@@ -59,7 +59,6 @@ cd "${SRC_DIR}"
 if [ "${OS}" = "netbsd" ]; then
   export PKG_CONFIG_PATH="/usr/pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
   export CPPFLAGS="-I/usr/pkg/include${CPPFLAGS:+ ${CPPFLAGS}}"
-  export CFLAGS="-I/usr/pkg/include${CFLAGS:+ ${CFLAGS}}"
   export LDFLAGS="-L/usr/pkg/lib -Wl,-R/usr/pkg/lib${LDFLAGS:+ ${LDFLAGS}}"
 fi
 

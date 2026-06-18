@@ -107,7 +107,7 @@ jobs:
           release: ${{ matrix.job.fullversion }}
           usesh: true
           prepare: |
-            /usr/sbin/pkg_add curl gmake perl
+            /usr/sbin/pkg_add curl gmake perl ncurses pkgconf
 
           run: |
             export TRIPLET=x86_64-unknown-netbsd

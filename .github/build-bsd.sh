@@ -51,6 +51,18 @@ ${TAR} -xzf "otp_src_${OTP_VERSION}.tar.gz" -C "${SRC_DIR}" --strip-components=1
 rm -f "otp_src_${OTP_VERSION}.tar.gz"
 
 cd "${SRC_DIR}"
+
+# OTP 29's tty NIF (nifs/common/prim_tty_nif.c) requires ncurses (NCURSES_CONST,
+# terminfo helpers) which NetBSD base lacks. pkgsrc installs ncurses + pkgconf
+# under /usr/pkg, so point pkg-config and the toolchain there. Scoped to NetBSD
+# and purely additive, so FreeBSD/OpenBSD and older OTP are unaffected.
+if [ "${OS}" = "netbsd" ]; then
+  export PKG_CONFIG_PATH="/usr/pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
+  export CPPFLAGS="-I/usr/pkg/include${CPPFLAGS:+ ${CPPFLAGS}}"
+  export CFLAGS="-I/usr/pkg/include${CFLAGS:+ ${CFLAGS}}"
+  export LDFLAGS="-L/usr/pkg/lib -Wl,-R/usr/pkg/lib${LDFLAGS:+ ${LDFLAGS}}"
+fi
+
 ./configure --without-javac --with-ssl="${OPENSSL_PREFIX_DIR}" --disable-dynamic-ssl-lib
 gmake -j"${NPROC}"
 gmake DESTDIR="${DESTDIR}" install

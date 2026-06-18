@@ -5,7 +5,7 @@ Precompiled OTP for NIF library CI builds.
 <table>
 <thead>
   <tr>
-    <th colspan="9">Availability<br></th>
+    <th colspan="11">Availability<br></th>
   </tr>
 </thead>
 <tbody>
@@ -13,17 +13,20 @@ Precompiled OTP for NIF library CI builds.
     <td></td>
     <td></td>
     <td><b>NIF Version →</b></td>
+    <td>2.18</td>
     <td colspan="2">2.17</td>
     <td colspan="3">2.16</td>
-    <td>2.15</td>
+    <td colspan="2">2.15</td>
   </tr>
   <tr>
     <td></td>
     <td></td>
     <td><b>Erlang/OTP Version →</b></td>
+    <td>29.0-29.0.2</td>
+    <td>27.3.3-28.5.0.2</td>
     <td>27.0</td>
-    <td>26.0-26.2.5</td>
-    <td>25.0-25.3.2.12</td>
+    <td>26.0-26.2.5.4</td>
+    <td>25.0-25.3.2.14</td>
     <td>24.3-24.3.4.17</td>
     <td>24.0-24.2.2</td>
     <td>23.3.4.19-23.3.4.20</td>
@@ -32,186 +35,95 @@ Precompiled OTP for NIF library CI builds.
     <td><b>OS ↓</b></td>
     <td><b>ABI ↓</b></td>
     <td><b>Architecture ↓</b></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
   <tr>
-    <td rowspan="12">Linux</td>
-    <td rowspan="6">gnu</td>
+    <td rowspan="13">Linux</td>
+    <td rowspan="7">gnu</td>
     <td>x86_64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>i686</td>
-    <td>✓<sup>1</sup></td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td></td><td></td><td>✓<sup>1</sup></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>aarch64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+  </tr>
+  <tr>
+    <td>armv7l</td>
+    <td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td></td><td>✓</td><td>✓</td><td></td><td></td><td></td>
   </tr>
   <tr>
     <td>riscv64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td></td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td>
   </tr>
   <tr>
-    <td>ppcle64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>ppc64le</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>s390x</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td rowspan="6">musl</td>
     <td>x86_64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
-    <td>i686</td>
-    <td>✓<sup>1</sup></td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>i386</td>
+    <td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>aarch64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td></td><td></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>riscv64</td>
-    <td>✓</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td></td><td></td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td>
   </tr>
   <tr>
-    <td>ppcle64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>ppc64le</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>s390x</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td rowspan="2">macOS</td>
     <td rowspan="2">darwin</td>
     <td>arm64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td></td>
-    <td></td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td>
   </tr>
   <tr>
     <td>x86_64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td rowspan="2">FreeBSD</td>
     <td>13</td>
     <td>x86_64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>14</td>
     <td>x86_64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td></td><td></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>OpenBSD</td>
     <td>7</td>
     <td>x86_64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>NetBSD</td>
     <td>9</td>
     <td>x86_64</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
-    <td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
 </tbody>
 </table>

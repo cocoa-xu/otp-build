@@ -45,7 +45,7 @@ Precompiled OTP for NIF library CI builds.
   </tr>
   <tr>
     <td>i686</td>
-    <td></td><td></td><td>✓<sup>1</sup></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>aarch64</td>
@@ -78,11 +78,11 @@ Precompiled OTP for NIF library CI builds.
   </tr>
   <tr>
     <td>aarch64</td>
-    <td></td><td></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
   </tr>
   <tr>
     <td>riscv64</td>
-    <td></td><td></td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td>
+    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td>
   </tr>
   <tr>
     <td>ppc64le</td>

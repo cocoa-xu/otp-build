@@ -24,6 +24,16 @@ on:
         required: false
         default: true
         type: boolean
+      build_aarch64:
+        description: 'Build aarch64'
+        required: false
+        default: true
+        type: boolean
+      build_riscv64:
+        description: 'Build riscv64'
+        required: false
+        default: true
+        type: boolean
       build_ppc64le:
         description: 'Build ppc64le'
         required: false
@@ -53,7 +63,7 @@ jobs:
       DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
     strategy:
       matrix:
-        arch: [x86_64, i386, ppc64le, s390x]
+        arch: [x86_64, i386, aarch64, riscv64, ppc64le, s390x]
       fail-fast: false
 
     name: ${{ matrix.arch }}-linux-musl
@@ -73,6 +83,14 @@ jobs:
 
             if [ "${{ matrix.arch }}" == "i386" ]; then
               echo "build=${{ inputs.build_i386 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.arch }}" == "aarch64" ]; then
+              echo "build=${{ inputs.build_aarch64 }}" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "${{ matrix.arch }}" == "riscv64" ]; then
+              echo "build=${{ inputs.build_riscv64 }}" >> $GITHUB_OUTPUT
             fi
 
             if [ "${{ matrix.arch }}" == "ppc64le" ]; then

@@ -2,131 +2,857 @@
 
 Precompiled OTP for NIF library CI builds.
 
+## Availability
+
+Precompiled Erlang/OTP grouped by major version — ✓ marks the platforms that have a build. Grab the `otp-<triplet>.tar.gz` for your OS / ABI / architecture from that version's release, or use the [GitHub Action](#github-action) below.
+
+### Erlang/OTP 29
+
 <table>
 <thead>
   <tr>
-    <th colspan="11">Availability<br></th>
+    <td></td><td></td><td><b>NIF Version →</b></td>
+    <td>2.18</td>
+  </tr>
+  <tr>
+    <td><b>OS</b></td><td><b>ABI</b></td><td><b>Arch \ OTP →</b></td>
+    <td>29.0-29.0.2</td>
   </tr>
 </thead>
 <tbody>
   <tr>
-    <td></td>
-    <td></td>
-    <td><b>NIF Version →</b></td>
-    <td>2.18</td>
-    <td colspan="2">2.17</td>
-    <td colspan="3">2.16</td>
-    <td colspan="2">2.15</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td><b>Erlang/OTP Version →</b></td>
-    <td>29.0-29.0.2</td>
-    <td>27.3.3-28.5.0.2</td>
-    <td>27.0</td>
-    <td>26.0-26.2.5.4</td>
-    <td>25.0-25.3.2.14</td>
-    <td>24.3-24.3.4.17</td>
-    <td>24.0-24.2.2</td>
-    <td>23.3.4.19-23.3.4.20</td>
-  </tr>
-  <tr>
-    <td><b>OS ↓</b></td>
-    <td><b>ABI ↓</b></td>
-    <td><b>Architecture ↓</b></td>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-  <tr>
     <td rowspan="13">Linux</td>
     <td rowspan="7">gnu</td>
     <td>x86_64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>i686</td>
-    <td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓<sup>1</sup></td>
   </tr>
   <tr>
     <td>aarch64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>armv7l</td>
-    <td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td></td><td>✓</td><td>✓</td><td></td><td></td><td></td>
+    <td>✓<sup>1</sup></td>
   </tr>
   <tr>
     <td>riscv64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>ppc64le</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>s390x</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td rowspan="6">musl</td>
     <td>x86_64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>i386</td>
-    <td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓<sup>1</sup></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓<sup>1</sup></td>
   </tr>
   <tr>
     <td>aarch64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>riscv64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>ppc64le</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>s390x</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td rowspan="2">macOS</td>
-    <td rowspan="2">darwin</td>
+    <td>darwin</td>
     <td>arm64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td>
+    <td>✓</td>
   </tr>
   <tr>
+    <td>darwin</td>
     <td>x86_64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td rowspan="2">FreeBSD</td>
     <td>13</td>
     <td>x86_64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
   </tr>
   <tr>
     <td>14</td>
     <td>x86_64</td>
-    <td></td><td></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td></td>
   </tr>
   <tr>
-    <td>OpenBSD</td>
-    <td>7</td>
-    <td>x86_64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
-  </tr>
-  <tr>
-    <td>NetBSD</td>
+    <td rowspan="1">NetBSD</td>
     <td>9</td>
     <td>x86_64</td>
-    <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
   </tr>
 </tbody>
 </table>
+
+### Erlang/OTP 28
+
+<table>
+<thead>
+  <tr>
+    <td></td><td></td><td><b>NIF Version →</b></td>
+    <td>2.17</td>
+  </tr>
+  <tr>
+    <td><b>OS</b></td><td><b>ABI</b></td><td><b>Arch \ OTP →</b></td>
+    <td>28.0-28.5.0.2</td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="13">Linux</td>
+    <td rowspan="7">gnu</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i686</td>
+    <td>✓<sup>1</sup></td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>armv7l</td>
+    <td>✓<sup>1</sup></td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="6">musl</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i386</td>
+    <td>✓<sup>1</sup></td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>darwin</td>
+    <td>arm64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>darwin</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FreeBSD</td>
+    <td>13</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>x86_64</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="1">NetBSD</td>
+    <td>9</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+</tbody>
+</table>
+
+### Erlang/OTP 27
+
+<table>
+<thead>
+  <tr>
+    <td></td><td></td><td><b>NIF Version →</b></td>
+    <td>2.17</td>
+    <td>2.17</td>
+    <td>2.17</td>
+    <td>2.17</td>
+    <td>2.17</td>
+  </tr>
+  <tr>
+    <td><b>OS</b></td><td><b>ABI</b></td><td><b>Arch \ OTP →</b></td>
+    <td>27.0</td>
+    <td>27.0.1-27.1</td>
+    <td>27.1.1</td>
+    <td>27.1.2</td>
+    <td>27.3-27.3.4.13</td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="13">Linux</td>
+    <td rowspan="7">gnu</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i686</td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>armv7l</td>
+    <td></td>
+    <td></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="6">musl</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i386</td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+    <td>✓<sup>1</sup></td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>darwin</td>
+    <td>arm64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>darwin</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FreeBSD</td>
+    <td>13</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="1">NetBSD</td>
+    <td>9</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td></td>
+    <td></td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+</tbody>
+</table>
+
+### Erlang/OTP 26
+
+<table>
+<thead>
+  <tr>
+    <td></td><td></td><td><b>NIF Version →</b></td>
+    <td>2.16</td>
+  </tr>
+  <tr>
+    <td><b>OS</b></td><td><b>ABI</b></td><td><b>Arch \ OTP →</b></td>
+    <td>26.0-26.2.5.4</td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="13">Linux</td>
+    <td rowspan="7">gnu</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i686</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>armv7l</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="6">musl</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i386</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>darwin</td>
+    <td>arm64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>darwin</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FreeBSD</td>
+    <td>13</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">NetBSD</td>
+    <td>9</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+</tbody>
+</table>
+
+### Erlang/OTP 25
+
+<table>
+<thead>
+  <tr>
+    <td></td><td></td><td><b>NIF Version →</b></td>
+    <td>2.16</td>
+  </tr>
+  <tr>
+    <td><b>OS</b></td><td><b>ABI</b></td><td><b>Arch \ OTP →</b></td>
+    <td>25.0-25.3.2.14</td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="13">Linux</td>
+    <td rowspan="7">gnu</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i686</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>armv7l</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="6">musl</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i386</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>darwin</td>
+    <td>arm64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>darwin</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FreeBSD</td>
+    <td>13</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">NetBSD</td>
+    <td>9</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+</tbody>
+</table>
+
+### Erlang/OTP 24
+
+<table>
+<thead>
+  <tr>
+    <td></td><td></td><td><b>NIF Version →</b></td>
+    <td>2.16</td>
+    <td>2.15</td>
+  </tr>
+  <tr>
+    <td><b>OS</b></td><td><b>ABI</b></td><td><b>Arch \ OTP →</b></td>
+    <td>24.3-24.3.4.17</td>
+    <td>24.0-24.2.2</td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="13">Linux</td>
+    <td rowspan="7">gnu</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i686</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>armv7l</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="6">musl</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i386</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td></td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>darwin</td>
+    <td>arm64</td>
+    <td>✓</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>darwin</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FreeBSD</td>
+    <td>13</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">NetBSD</td>
+    <td>9</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+</tbody>
+</table>
+
+### Erlang/OTP 23
+
+<table>
+<thead>
+  <tr>
+    <td></td><td></td><td><b>NIF Version →</b></td>
+    <td>2.15</td>
+  </tr>
+  <tr>
+    <td><b>OS</b></td><td><b>ABI</b></td><td><b>Arch \ OTP →</b></td>
+    <td>23.3.4.19-23.3.4.20</td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="13">Linux</td>
+    <td rowspan="7">gnu</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i686</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>armv7l</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="6">musl</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>i386</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>aarch64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>riscv64</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>ppc64le</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>s390x</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>darwin</td>
+    <td>arm64</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>darwin</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FreeBSD</td>
+    <td>13</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">NetBSD</td>
+    <td>9</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+  <tr>
+    <td rowspan="1">OpenBSD</td>
+    <td>7</td>
+    <td>x86_64</td>
+    <td>✓</td>
+  </tr>
+</tbody>
+</table>
+
 
 <footer>
   

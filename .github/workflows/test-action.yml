@@ -49,6 +49,8 @@ jobs:
       - run: apk add --no-cache bash curl tar git ncurses libstdc++
       - uses: actions/checkout@v6
       - name: Install OTP
-        run: INPUT_OTP_VERSION='29.0.2' bash install-otp.sh
+        run: |
+          INPUT_OTP_VERSION='29.0.2' bash install-otp.sh
       - name: Verify
-        run: erl -noshell -eval 'io:format("musl erl: OTP ~s~n",[erlang:system_info(otp_release)]), halt().'
+        run: |
+          erl -noshell -eval 'io:format("musl erl OTP ~s~n",[erlang:system_info(otp_release)]), halt().'

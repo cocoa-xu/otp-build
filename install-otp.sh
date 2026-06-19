@@ -125,6 +125,21 @@ asset_ok() { # version -> 0 if otp-<triplet>.tar.gz exists for it
   [ "$code" = 200 ]
 }
 
+# Read versions on stdin, echo those satisfying the requirement ($op/$ver/$upper).
+# Kept as a function (not an inline case in $(...)) for bash 3.2 (macOS) parsing.
+constraint_match() {
+  local v
+  while read -r v; do
+    case "$op" in
+      "~>") if ver_le "$ver" "$v" && ver_lt "$v" "$upper"; then echo "$v"; fi ;;
+      ">=") if ver_le "$ver" "$v"; then echo "$v"; fi ;;
+      ">")  if ver_lt "$ver" "$v"; then echo "$v"; fi ;;
+      "<=") if ver_le "$v" "$ver"; then echo "$v"; fi ;;
+      "<")  if ver_lt "$v" "$ver"; then echo "$v"; fi ;;
+    esac
+  done
+}
+
 # ----------------------------------------------------------------------------
 # Resolve to a concrete version that actually has an artifact for this platform.
 # ----------------------------------------------------------------------------
@@ -135,15 +150,7 @@ if [ "$op" = "==" ]; then
 else
   upper=""; if [ "$op" = "~>" ]; then upper="$(tilde_upper "$ver")"; fi
   # candidate versions matching the constraint, highest first
-  candidates="$(list_versions | while read -r v; do
-      case "$op" in
-        "~>") if ver_le "$ver" "$v" && ver_lt "$v" "$upper"; then echo "$v"; fi ;;
-        ">=") if ver_le "$ver" "$v"; then echo "$v"; fi ;;
-        ">")  if ver_lt "$ver" "$v"; then echo "$v"; fi ;;
-        "<=") if ver_le "$v" "$ver"; then echo "$v"; fi ;;
-        "<")  if ver_lt "$v" "$ver"; then echo "$v"; fi ;;
-      esac
-    done | sort -rV)"
+  candidates="$(list_versions | constraint_match | sort -rV)"
   [ -n "$candidates" ] || err "no OTP release satisfies '${op} ${ver}'"
   while read -r v; do
     [ -z "$v" ] && continue

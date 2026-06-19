@@ -17,7 +17,7 @@ on:
         type: boolean
   push:
     tags:
-      - "v*"
+      - "v*.*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.otp_version }}

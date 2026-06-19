@@ -59,7 +59,7 @@ on:
         type: boolean
   push:
     tags:
-      - "v*"
+      - "v*.*"
 
 permissions:
   contents: write

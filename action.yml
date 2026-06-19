@@ -1,0 +1,64 @@
+name: 'Install Erlang/OTP'
+description: 'Download and set up a precompiled Erlang/OTP for the current runner from cocoa-xu/otp-build.'
+author: 'cocoa-xu'
+branding:
+  icon: 'cpu'
+  color: 'red'
+
+inputs:
+  otp_version:
+    description: >-
+      OTP version or requirement. An exact version (e.g. "27.2") matches that
+      release exactly; an Elixir-style requirement resolves to the highest
+      available release that satisfies it: "~> 27" (any 27.x), "~> 27.1"
+      (>= 27.1, < 28), ">= 26.2", "< 28", etc.
+    required: false
+  otp-version:
+    description: 'Alias for otp_version.'
+    required: false
+  install-dir:
+    description: 'Directory to extract Erlang/OTP into.'
+    required: false
+    default: '.otp'
+  add-to-path:
+    description: 'Append the OTP bin directory to PATH (via GITHUB_PATH).'
+    required: false
+    default: 'true'
+  repository:
+    description: 'The otp-build repository to download releases from.'
+    required: false
+    default: 'cocoa-xu/otp-build'
+  token:
+    description: 'Token used to list releases when resolving a requirement (exact versions need no token).'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  otp-version:
+    description: 'The concrete OTP version that was resolved and installed.'
+    value: ${{ steps.install.outputs.otp-version }}
+  install-dir:
+    description: 'Absolute path the archive was extracted to.'
+    value: ${{ steps.install.outputs.install-dir }}
+  bindir:
+    description: 'Absolute path of the OTP bin directory (added to PATH).'
+    value: ${{ steps.install.outputs.bindir }}
+  erl-rootdir:
+    description: 'Value exported as ERL_ROOTDIR.'
+    value: ${{ steps.install.outputs.erl-rootdir }}
+  triplet:
+    description: 'The detected platform triplet (e.g. x86_64-linux-gnu).'
+    value: ${{ steps.install.outputs.triplet }}
+
+runs:
+  using: 'composite'
+  steps:
+    - id: install
+      shell: bash
+      run: bash "${{ github.action_path }}/install-otp.sh"
+      env:
+        INPUT_OTP_VERSION: ${{ inputs.otp_version || inputs.otp-version }}
+        INPUT_INSTALL_DIR: ${{ inputs.install-dir }}
+        INPUT_ADD_TO_PATH: ${{ inputs.add-to-path }}
+        INPUT_REPOSITORY: ${{ inputs.repository }}
+        INPUT_TOKEN: ${{ inputs.token }}

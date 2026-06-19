@@ -1,0 +1,57 @@
+name: test-action
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'action.yml'
+      - 'install-otp.sh'
+      - '.github/workflows/test-action.yml'
+  pull_request:
+    paths:
+      - 'action.yml'
+      - 'install-otp.sh'
+      - '.github/workflows/test-action.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.runs-on }} (${{ matrix.otp }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runs-on: ubuntu-latest,     otp: '27.0' }
+          - { runs-on: ubuntu-latest,     otp: '~> 28' }
+          - { runs-on: ubuntu-24.04-arm,  otp: '~> 29' }
+          - { runs-on: macos-14,          otp: '~> 29' }
+          - { runs-on: macos-15-intel,    otp: '>= 27' }
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install OTP
+        id: otp
+        uses: ./
+        with:
+          otp_version: ${{ matrix.otp }}
+      - name: Verify
+        run: |
+          echo "requested '${{ matrix.otp }}' -> resolved '${{ steps.otp.outputs.otp-version }}' (${{ steps.otp.outputs.triplet }})"
+          erl -noshell -eval 'io:format("erl on PATH: OTP ~s~n",[erlang:system_info(otp_release)]), halt().'
+
+  test-musl:
+    name: alpine musl (~> 29)
+    runs-on: ubuntu-latest
+    container: alpine:latest
+    steps:
+      - run: apk add --no-cache bash curl tar ncurses libstdc++
+      - uses: actions/checkout@v6
+      - name: Install OTP
+        id: otp
+        uses: ./
+        with:
+          otp_version: '~> 29'
+      - name: Verify
+        run: |
+          echo "resolved '${{ steps.otp.outputs.otp-version }}' (${{ steps.otp.outputs.triplet }})"
+          erl -noshell -eval 'io:format("musl erl: OTP ~s~n",[erlang:system_info(otp_release)]), halt().'

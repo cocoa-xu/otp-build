@@ -134,6 +134,51 @@ Precompiled OTP for NIF library CI builds.
   
 </footer>
 
+## GitHub Action
+
+Install a precompiled Erlang/OTP in a single step:
+
+```yaml
+      - name: Install OTP
+        uses: cocoa-xu/otp-build@v1
+        with:
+          otp_version: '27.0'
+
+      - run: erl -version
+```
+
+`otp_version` accepts an exact version **or** an Elixir-style requirement. The
+action resolves it to the newest release that satisfies the requirement *and*
+has a build for the runner's platform:
+
+| `otp_version` | resolves to |
+|---|---|
+| `27.0` | exactly `27.0` (the release must exist) |
+| `~> 27` | newest `27.x` |
+| `~> 27.1` | newest `>= 27.1` and `< 28` |
+| `~> 27.3.4` | newest `>= 27.3.4` and `< 27.4` |
+| `>= 26.2` | newest `>= 26.2` |
+| `< 28` | newest `< 28` |
+
+The platform (Linux gnu/musl or macOS, across the architectures in the table
+above) is detected automatically; the matching `otp-<triplet>.tar.gz` is
+downloaded and extracted, OTP's `bin` is appended to `PATH`, and `ERL_ROOTDIR`
+is exported.
+
+### Inputs
+
+| input | default | description |
+|---|---|---|
+| `otp_version` | — | exact version or requirement (required) |
+| `install-dir` | `.otp` | directory to extract into |
+| `add-to-path` | `true` | append OTP `bin` to `PATH` |
+| `repository` | `cocoa-xu/otp-build` | release source |
+| `token` | `${{ github.token }}` | used to list releases when resolving a requirement (exact versions need none) |
+
+### Outputs
+
+`otp-version` (the resolved version), `install-dir`, `bindir`, `erl-rootdir`, and `triplet`.
+
 ## Example
 
 ### Without Action Cache

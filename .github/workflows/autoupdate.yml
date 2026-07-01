@@ -10,13 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.AUTO_UPDATE_TOKEN }}
 
       - name: Get latest version
         id: otp-version
         run: |
+          export GITHUB_API_TOKEN="${{ secrets.LAST_VERSION_TOKEN }}"
+          
           pip3 install -U lastversion
           OTP27_VERSION=$(lastversion -b 27 erlang)
           OTP26_VERSION=$(lastversion -b 26 erlang)

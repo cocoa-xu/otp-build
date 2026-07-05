@@ -63,6 +63,13 @@ case $TARGET in
     ;;
 esac
 
+# Released OTP source (24-29) predates C23 and uses identifiers such as `bool`
+# that C23 promoted to reserved keywords. Rolling base images now ship compilers
+# (e.g. GCC 15 on alpine:edge) that default to C23, breaking the build. OTP only
+# requires C11, so pin the C dialect to gnu17 to keep the toolchain default from
+# reintroducing this class of failure. C++ (asmjit) is unaffected and left alone.
+export CFLAGS="-std=gnu17 -O2 -g${CFLAGS:+ $CFLAGS}"
+
 tar -xzf "otp_src_${OTP_VERSION}.tar.gz" -C "otp_src_${OTP_VERSION}" --strip-components=1
 cd "otp_src_${OTP_VERSION}"
 

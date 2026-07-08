@@ -159,7 +159,7 @@ jobs:
       - name: Cache OTP Source Code
         if: steps.build-check.outputs.build == 'true'
         id: cache-otp
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: otp-${{ steps.build-check.outputs.version }}
           path: |
@@ -176,7 +176,7 @@ jobs:
       - name: Cache Precompiled OpenSSL
         if: steps.build-check.outputs.build == 'true'
         id: cache-openssl
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: openssl-${{ steps.build-check.outputs.openssl_version }}-${{ matrix.job.target }}
           path: |
@@ -193,7 +193,7 @@ jobs:
       - name: Cache Precompiled wxWidgets
         if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false'
         id: cache-wxwidgets
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ steps.build-check.outputs.wxwidgets_version }}-${{ matrix.job.target }}
           path: |

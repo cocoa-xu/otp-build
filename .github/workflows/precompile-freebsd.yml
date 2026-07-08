@@ -70,7 +70,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 24 and below
         if: steps.build-check.outputs.build == 'true' && startsWith(steps.build-check.outputs.version, '24.')
         id: cache-openssl-otp24
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: openssl-111-${{ env.OPENSSL_VERSION_OTP_24_AND_BELOW }}-x86_64-unknown-freebsd${{ matrix.job.fullversion }}
           path: |
@@ -84,7 +84,7 @@ jobs:
       - name: Cache Precompiled OpenSSL for OTP 25 and above
         if: "steps.build-check.outputs.build == 'true' && !startsWith(steps.build-check.outputs.version, '24.')"
         id: cache-openssl
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: openssl-${{ env.OPENSSL_VERSION }}-${{ matrix.job.arch }}-unknown-freebsd${{ matrix.job.fullversion }}
           path: |
@@ -98,7 +98,7 @@ jobs:
       - name: Cache OTP Source
         if: steps.build-check.outputs.build == 'true'
         id: cache-otp
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: otp-${{ steps.build-check.outputs.version }}
           path: |

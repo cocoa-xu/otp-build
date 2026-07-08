@@ -40,7 +40,7 @@ jobs:
 
       - name: Cache WSL Ubuntu
         id: cache-wsl-ubuntu
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           # key: wsl-ubuntu-${{ env.WSL_UBUNTU_VERSION }}-${{ steps.wsl-ubuntu-etag.outputs.etag }}
           key: wsl-ubuntu-${{ env.WSL_UBUNTU_VERSION }}
@@ -71,7 +71,7 @@ jobs:
 
       - name: Cache LLVM MinGW
         id: cache-llvm-mingw
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: llvm-mingw-${{ env.LLVM_MINGW_VERSION }}
           path: |
@@ -94,7 +94,7 @@ jobs:
 
       - name: Cache Microsoft OpenJDK
         id: cache-microsoft-openjdk
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: microsoft-openjdk-${{ env.MS_OPENJDK_VERSION }}
           path: |
@@ -115,7 +115,7 @@ jobs:
 
       - name: Cache Nullsoft NSIS Installer
         id: cache-nsis
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: nsis-${{ env.NSIS_VERSION }}
           path: |
@@ -138,7 +138,7 @@ jobs:
 
       - name: Cache Precompiled Static OpenSSL
         id: cache-static-openssl
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           key: static-openssl-${{ env.LLVM_MINGW_VERSION }}
           path: |

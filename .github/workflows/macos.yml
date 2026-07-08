@@ -145,23 +145,14 @@ jobs:
           curl -fSL "https://github.com/cocoa-xu/openssl-build/releases/download/v${{ steps.build-check.outputs.openssl_version }}/${OPENSSL_FILENAME}.sha256" -o "${OPENSSL_FILENAME}.sha256"
           shasum -c "${OPENSSL_FILENAME}.sha256"
 
-      - name: Cache Precompiled wxWidgets
+      - name: Install Precompiled wxWidgets
         if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false'
-        id: cache-wxwidgets
-        uses: actions/cache@v6
+        uses: cocoa-xu/wxWidgets-build@main
         with:
-          key: wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ steps.build-check.outputs.wxwidgets_version }}-${{ matrix.job.target }}
-          path: |
-            ./wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz
-            ./wxwidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz.sha256
-
-      - name: Download Precompiled wxWidgets
-        if: steps.build-check.outputs.build == 'true' && steps.build-check.outputs.with_wxwidgets != 'false' && steps.cache-wxwidgets.outputs.cache-hit != 'true'
-        run: |
-          export WXWIDGETS_FILENAME="wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz"
-          curl -fSL "https://github.com/cocoa-xu/wxWidgets-build/releases/download/v${{ steps.build-check.outputs.wxwidgets_version }}/${WXWIDGETS_FILENAME}" -o "${WXWIDGETS_FILENAME}"
-          curl -fSL "https://github.com/cocoa-xu/wxWidgets-build/releases/download/v${{ steps.build-check.outputs.wxwidgets_version }}/${WXWIDGETS_FILENAME}.sha256" -o "${WXWIDGETS_FILENAME}.sha256"
-          shasum -c "${WXWIDGETS_FILENAME}.sha256"
+          wxwidgets_version: ${{ steps.build-check.outputs.wxwidgets_version }}
+          library: ${{ steps.build-check.outputs.with_wxwidgets }}
+          triplet: ${{ matrix.job.target }}
+          install-dir: .wxwidgets-${{ matrix.job.target }}
 
       - name: Compile OTP
         if: steps.build-check.outputs.build == 'true'
@@ -193,16 +184,7 @@ jobs:
           fi
 
           if [ "${{ steps.build-check.outputs.with_wxwidgets }}" != "false" ]; then
-            export WXWIDGETS_ARCHIVE="wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz"
-            sudo tar -C "/usr/local" -xf "${WXWIDGETS_ARCHIVE}" --strip-components=3
-
-            # The prebuilt bin/wx-config is an absolute symlink into the
-            # wxWidgets-build CI workspace, which does not exist here. Re-point it
-            # at the extracted config script via a relative symlink.
-            WXCONFIG="$(ls /usr/local/lib/wx/config/ | head -n1)"
-            sudo ln -sf "../lib/wx/config/${WXCONFIG}" /usr/local/bin/wx-config
-
-            /usr/local/bin/wx-config --version
+            "${WX_CONFIG:-wx-config}" --version
           fi
 
           tar -xzf "otp_src_${{ steps.build-check.outputs.version }}.tar.gz" -C "${OTP_SRC}" --strip-components=1

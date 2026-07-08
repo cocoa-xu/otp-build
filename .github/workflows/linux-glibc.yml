@@ -21,7 +21,7 @@ on:
       wxwidgets_version:
         description: 'wxWidgets Version'
         required: false
-        default: '3.3.2'
+        default: '3.3.3.1'
       build_aarch64:
         description: 'Build aarch64'
         required: false
@@ -73,7 +73,7 @@ jobs:
     env:
       DEFAULT_OPENSSL_VERSION: "3.6.3"
       DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
-      DEFAULT_WXWIDGETS_VERSION: "3.3.2"
+      DEFAULT_WXWIDGETS_VERSION: "3.3.3.1"
     strategy:
       fail-fast: false
       matrix:

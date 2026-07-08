@@ -28,7 +28,7 @@ jobs:
           - { runs-on: macos-15-intel,    otp: '>= 27' }
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install OTP
         id: otp
         uses: ./
@@ -47,7 +47,7 @@ jobs:
     container: alpine:latest
     steps:
       - run: apk add --no-cache bash curl tar git ncurses libstdc++
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install OTP
         run: |
           INPUT_OTP_VERSION='29.0.2' bash install-otp.sh

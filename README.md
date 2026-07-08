@@ -931,7 +931,7 @@ jobs:
 
     steps:
       # this will clone and setup your repo
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # Download precompiled Erlang/OTP
       - name: Download Erlang/OTP
@@ -995,7 +995,7 @@ jobs:
 
     steps:
       # This will clone and setup your repo
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # Cache precompiled Erlang/OTP for speedup
       - name: Cache OTP

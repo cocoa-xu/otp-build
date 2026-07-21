@@ -1,5 +1,7 @@
 # otp-build
 
+[![Sponsor cocoa-xu](https://img.shields.io/github/sponsors/cocoa-xu?label=Sponsor&logo=github&color=ea4aaa)](https://github.com/sponsors/cocoa-xu)
+
 Precompiled OTP for NIF library CI builds.
 
 ## Availability
@@ -1091,3 +1093,11 @@ jobs:
           # do work below, e.g.,
           # mix test
 ```
+
+## Sponsor
+
+[![Sponsor cocoa-xu](https://img.shields.io/github/sponsors/cocoa-xu?label=Sponsor%20cocoa-xu&logo=github&color=ea4aaa)](https://github.com/sponsors/cocoa-xu)
+
+Every OTP release here is rebuilt for ~20 OS/ABI/arch combinations: QEMU-emulated riscv64, ppc64le, s390x and armv7l, FreeBSD/NetBSD/OpenBSD VMs, and self-hosted aarch64 Windows hardware. The precompiled [OpenSSL](https://github.com/cocoa-xu/openssl-build) and [wxWidgets](https://github.com/cocoa-xu/wxWidgets-build) builds these depend on are maintained the same way.
+
+If they save your CI time, consider sponsoring [@cocoa-xu](https://github.com/sponsors/cocoa-xu).

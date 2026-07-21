@@ -864,32 +864,15 @@ Precompiled Erlang/OTP grouped by major version — ✓ marks the platforms that
 
 ## Build Dependencies
 
-The build jobs never compile OpenSSL or wxWidgets from source — they pull precompiled artifacts from my own repos:
+Nothing here is compiled from source — the build jobs pull precompiled artifacts from my other repos:
 
-| Dependency | Source | Version |
-|---|---|---|
-| OpenSSL | [cocoa-xu/openssl-build](https://github.com/cocoa-xu/openssl-build) releases | `3.6.3`, or `1.1.1w` for the older OTP series noted below |
-| wxWidgets | [cocoa-xu/wxWidgets-build](https://github.com/cocoa-xu/wxWidgets-build) action | `3.3.3.1` |
+- **[cocoa-xu/openssl-build](https://github.com/cocoa-xu/openssl-build)** — OpenSSL `3.6.3`, or `1.1.1w` for OTP 24 and below, linked statically
+  - Linux (gnu) · Linux (musl) · macOS · FreeBSD · NetBSD · OpenBSD · Windows (aarch64)
+  - **[cocoa-xu/perl-windows-build](https://github.com/cocoa-xu/perl-windows-build)** — perl5, required to configure OpenSSL on Windows
+- **[cocoa-xu/wxWidgets-build](https://github.com/cocoa-xu/wxWidgets-build)** — wxWidgets `3.3.3.1`, linked statically
+  - Linux (gnu), except i686 · macOS
 
-Both are linked statically (OTP is configured with `--disable-dynamic-ssl-lib`), so the released `otp-<triplet>.tar.gz` carries no runtime dependency on either.
-
-### By OS
-
-| OS | Arch | OpenSSL artifact | OpenSSL version | wxWidgets |
-|---|---|---|---|---|
-| Linux (gnu) | x86_64, i686, aarch64, armv7l, riscv64, ppc64le, s390x | `openssl-<triplet>.tar.gz` | 3.6.3 | 3.3.3.1 — except i686 |
-| Linux (musl) | x86_64, i386, aarch64, riscv64, ppc64le, s390x | `openssl-<arch>-linux-musl.tar.gz` | 1.1.1w for OTP 23.x/24.x, otherwise 3.6.3 | — |
-| macOS | arm64, x86_64 | `openssl-<triplet>.tar.gz` | 3.6.3 | 3.3.3.1 |
-| FreeBSD | x86_64 | `openssl-x86_64-unknown-freebsd.tar.gz` | 1.1.1w for OTP 24.x, otherwise 3.6.3 | — |
-| NetBSD | x86_64 | `openssl-x86_64-unknown-netbsd.tar.gz` | 1.1.1w for OTP 23.x/24.x, otherwise 3.6.3 | — |
-| OpenBSD | x86_64 | `openssl-x86_64-unknown-openbsd.tar.gz` | 1.1.1w for OTP 23.x/24.x, otherwise 3.6.3 | — |
-| Windows (MSVC) | aarch64 | `openssl-static-aarch64-windows-msvc.tar.gz` | 3.6.3 | — |
-
-Triplets match the availability tables above, e.g. `openssl-aarch64-linux-gnu.tar.gz`. The musl `i386` job pulls the `i686-linux-musl` tarball, because 32-bit x86 OpenSSL is published under the `i686` triplet.
-
-The aarch64 Windows/MSVC build is manual (`workflow_dispatch`), ships an `otp_win32_<version>.exe` installer instead of a tarball, and builds from the `cx/windows-arm64` branch of my [cocoa-xu/otp](https://github.com/cocoa-xu/otp) fork.
-
-Everything else comes from upstream: OTP source from [erlang/otp](https://github.com/erlang/otp), and — Windows only — [llvm-mingw](https://github.com/mstorsjo/llvm-mingw) and Microsoft's aarch64 OpenJDK.
+Everything else is upstream: OTP source from [erlang/otp](https://github.com/erlang/otp), plus [llvm-mingw](https://github.com/mstorsjo/llvm-mingw) and Microsoft's aarch64 OpenJDK for the Windows build.
 
 ## GitHub Action
 

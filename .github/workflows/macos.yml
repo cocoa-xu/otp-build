@@ -72,14 +72,25 @@ jobs:
         id: build-check
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            echo "build=true" >> $GITHUB_OUTPUT
-            
             export OTP_VERSION_V=${GITHUB_REF##*/v}
+          else
+            export OTP_VERSION_V="${{ inputs.otp_verison }}"
+          fi
+
+          export OTP_VERSION="${OTP_VERSION_V#v}"
+          export OTP_MAJOR_VER="${OTP_VERSION%%.*}"
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "build=true" >> $GITHUB_OUTPUT
 
             echo "with_wxwidgets=static" >> $GITHUB_OUTPUT
             echo "wxwidgets_version=${{ env.DEFAULT_WXWIDGETS_VERSION }}" >> $GITHUB_OUTPUT
             echo "with_openssl=static" >> $GITHUB_OUTPUT
-            echo "openssl_version=${{ env.DEFAULT_OPENSSL_VERSION }}" >> $GITHUB_OUTPUT
+            if [ "${OTP_MAJOR_VER}" -le "24" ]; then
+              echo "openssl_version=${{ env.DEFAULT_OPENSSL_VERSION_OTP24 }}" >> $GITHUB_OUTPUT
+            else
+              echo "openssl_version=${{ env.DEFAULT_OPENSSL_VERSION }}" >> $GITHUB_OUTPUT
+            fi
           else
             if [ "${{ matrix.job.target }}" == "arm64-apple-darwin" ]; then
               echo "build=${{ inputs.build_arm64 }}" >> $GITHUB_OUTPUT
@@ -89,15 +100,12 @@ jobs:
               echo "build=${{ inputs.build_x86_64 }}" >> $GITHUB_OUTPUT
             fi
 
-            export OTP_VERSION_V=${{ inputs.otp_verison }}
-
             echo "with_wxwidgets=${{ inputs.wxwidgets }}" >> $GITHUB_OUTPUT
             echo "wxwidgets_version=${{ inputs.wxwidgets_version }}" >> $GITHUB_OUTPUT
             echo "with_openssl=${{ inputs.openssl }}" >> $GITHUB_OUTPUT
             echo "openssl_version=${{ inputs.openssl_version }}" >> $GITHUB_OUTPUT
           fi
 
-          export OTP_VERSION="${OTP_VERSION_V#v}"
           echo "version=${OTP_VERSION}" >> $GITHUB_OUTPUT
           echo "major=${OTP_MAJOR_VER}" >> $GITHUB_OUTPUT
           if [ "${OTP_MAJOR_VER}" -lt "25" ]; then

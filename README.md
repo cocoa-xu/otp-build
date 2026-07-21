@@ -1079,6 +1079,6 @@ Nothing here is compiled from source — the build jobs pull precompiled artifac
 
 [![Sponsor cocoa-xu](https://img.shields.io/github/sponsors/cocoa-xu?label=Sponsor%20cocoa-xu&logo=github&color=ea4aaa)](https://github.com/sponsors/cocoa-xu)
 
-Every OTP release here is rebuilt for ~20 OS/ABI/arch combinations: QEMU-emulated riscv64, ppc64le, s390x and armv7l, FreeBSD/NetBSD/OpenBSD VMs, and self-hosted aarch64 Windows hardware. The precompiled [OpenSSL](https://github.com/cocoa-xu/openssl-build) and [wxWidgets](https://github.com/cocoa-xu/wxWidgets-build) builds these depend on are maintained the same way.
+Every OTP release here is rebuilt for ~20 OS/ABI/arch combinations: QEMU-emulated riscv64, ppc64le, s390x and armv7l, FreeBSD/NetBSD/OpenBSD VMs, and self-hosted aarch64 Windows hardware.
 
-If they save your CI time, consider sponsoring [@cocoa-xu](https://github.com/sponsors/cocoa-xu).
+If these builds save your CI time, consider sponsoring [@cocoa-xu](https://github.com/sponsors/cocoa-xu).

@@ -107,7 +107,7 @@ jobs:
           release: ${{ matrix.job.fullversion }}
           usesh: true
           prepare: |
-            export PKG_PATH="http://archive.NetBSD.org/pub/pkgsrc-archive/packages/NetBSD/x86_64/9.0_2026Q1/All"
+            export PKG_PATH="http://archive.NetBSD.org/pub/pkgsrc-archive/packages/NetBSD/x86_64/9.0_2026Q1/All/"
             /usr/sbin/pkg_add curl gmake perl ncurses pkgconf
 
           run: |

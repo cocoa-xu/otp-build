@@ -40,15 +40,15 @@ jobs:
         id: build-check
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            echo "build=true" >> $GITHUB_OUTPUT
+            echo "build=true" >> "$GITHUB_OUTPUT"
             export BUILD_VERSION_V="v${GITHUB_REF##*/v}"
           else
-            echo "build=${{ inputs.build_x86_64 }}" >> $GITHUB_OUTPUT
+            echo "build=${{ inputs.build_x86_64 }}" >> "$GITHUB_OUTPUT"
             export BUILD_VERSION_V="${{ inputs.otp_version }}"
           fi
 
           export BUILD_VERSION="${BUILD_VERSION_V#v}"
-          echo "version=${BUILD_VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${BUILD_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
         if: steps.build-check.outputs.build == 'true'
@@ -107,6 +107,7 @@ jobs:
           release: ${{ matrix.job.fullversion }}
           usesh: true
           prepare: |
+            export PKG_PATH="https://archive.NetBSD.org/pub/pkgsrc-archive/packages/NetBSD/x86_64/9.0_2026Q1/All"
             /usr/sbin/pkg_add curl gmake perl ncurses pkgconf
 
           run: |

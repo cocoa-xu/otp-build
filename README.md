@@ -1069,7 +1069,7 @@ jobs:
 
 Nothing here is compiled from source — the build jobs pull precompiled artifacts from my other repos:
 
-- **[cocoa-xu/openssl-build](https://github.com/cocoa-xu/openssl-build)** — OpenSSL `3.6.3`, or `1.1.1w` for OTP 24 and below, linked statically
+- **[cocoa-xu/openssl-build](https://github.com/cocoa-xu/openssl-build)** — OpenSSL `3.5.9` (LTS), or `1.1.1w` for OTP 24 and below, linked statically
   - Linux (gnu) · Linux (musl) · macOS · FreeBSD · NetBSD · OpenBSD · Windows (aarch64)
   - **[cocoa-xu/perl-windows-build](https://github.com/cocoa-xu/perl-windows-build)** — perl5, required to configure OpenSSL on Windows
 - **[cocoa-xu/wxWidgets-build](https://github.com/cocoa-xu/wxWidgets-build)** — wxWidgets `3.3.3.1`, linked statically

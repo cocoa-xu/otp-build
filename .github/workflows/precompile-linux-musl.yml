@@ -59,7 +59,7 @@ jobs:
   linux-musl:
     runs-on: ubuntu-latest
     env:
-      DEFAULT_OPENSSL_VERSION: "3.6.3"
+      DEFAULT_OPENSSL_VERSION: "3.5.9"
       DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
     strategy:
       matrix:

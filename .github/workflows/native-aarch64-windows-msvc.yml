@@ -24,7 +24,7 @@ jobs:
       MS_OPENJDK_TAG: "jdk-16.0.2-ga"
       MS_OPENJDK_VERSION_PATH: "16.0.2.7-hotspot"
       NSIS_VERSION: "3.09"
-      OPENSSL_VERSION: "3.6.3"
+      OPENSSL_VERSION: "3.5.9"
     steps:
       - name: Enable WSL and Virtual Machine Platform
         run: |
@@ -140,7 +140,7 @@ jobs:
         id: cache-static-openssl
         uses: actions/cache@v6
         with:
-          key: static-openssl-${{ env.LLVM_MINGW_VERSION }}
+          key: static-openssl-${{ env.OPENSSL_VERSION }}-${{ env.LLVM_MINGW_VERSION }}
           path: |
             ./openssl-static-aarch64-windows-msvc.tar.gz
 

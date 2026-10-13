@@ -31,7 +31,7 @@ jobs:
     if: "!startsWith(github.ref, 'refs/tags/v23')"
     runs-on: ubuntu-latest
     env:
-      OPENSSL_VERSION: "3.6.3"
+      OPENSSL_VERSION: "3.5.9"
       OPENSSL_VERSION_OTP_24_AND_BELOW: "1.1.1w"
     strategy:
       fail-fast: false

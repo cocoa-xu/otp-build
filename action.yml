@@ -55,7 +55,8 @@ runs:
   steps:
     - id: install
       shell: bash
-      run: bash "${{ github.action_path }}/install-otp.sh"
+      # github.action_path is the host path; GITHUB_ACTION_PATH is mapped into container jobs.
+      run: bash "$GITHUB_ACTION_PATH/install-otp.sh"
       env:
         INPUT_OTP_VERSION: ${{ inputs.otp_version || inputs.otp-version }}
         INPUT_INSTALL_DIR: ${{ inputs.install-dir }}

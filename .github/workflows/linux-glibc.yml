@@ -78,7 +78,7 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { target: "aarch64-linux-gnu", runs-on: "ubuntu-latest", arch: "aarch64", image: "ubuntu:20.04", platform: "linux/aarch64" }
+          - { target: "aarch64-linux-gnu", runs-on: "ubuntu-24.04-arm", arch: "aarch64", image: "ubuntu:20.04", platform: "linux/aarch64" }
           - { target: "x86_64-linux-gnu", runs-on: "ubuntu-latest", arch: "x86_64", image: "ubuntu:20.04", platform: "linux/amd64" }
           - { target: "i686-linux-gnu", runs-on: "ubuntu-latest", arch: "i686", image: "i386/debian:bookworm", platform: "linux/386" }
           - { target: "armv7l-linux-gnueabihf", runs-on: "ubuntu-latest", arch: "armv7l", image: "ubuntu:20.04", platform: "linux/arm/v7" }

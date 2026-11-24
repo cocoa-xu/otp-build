@@ -30,7 +30,7 @@ on:
       wxwidgets_version:
         description: 'wxWidgets Version'
         required: false
-        default: '3.3.3.1'
+        default: '3.3.4'
       build_arm64:
         description: 'Build ARM64'
         required: false
@@ -57,7 +57,7 @@ jobs:
     env:
       # CFLAGS alone leaves the linked binaries at the runner's macOS version.
       MACOSX_DEPLOYMENT_TARGET: "11.0"
-      DEFAULT_WXWIDGETS_VERSION: "3.3.3.1"
+      DEFAULT_WXWIDGETS_VERSION: "3.3.4"
       DEFAULT_OPENSSL_VERSION: "3.5.9"
       DEFAULT_OPENSSL_VERSION_OTP24: "1.1.1w"
     strategy:

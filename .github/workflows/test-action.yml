@@ -40,8 +40,7 @@ jobs:
           erl -noshell -eval 'io:format("erl on PATH: OTP ~s~n",[erlang:system_info(otp_release)]), halt().'
 
   test-musl:
-    # Local actions (uses: ./) don't path-map into container jobs, so run the
-    # script directly to exercise the musl triplet detection + download.
+    # Runs the action inside a container, where only GITHUB_ACTION_PATH points at it.
     name: alpine musl (29.0.2)
     runs-on: ubuntu-latest
     container: alpine:latest
@@ -49,8 +48,9 @@ jobs:
       - run: apk add --no-cache bash curl tar git ncurses libstdc++
       - uses: actions/checkout@v7
       - name: Install OTP
-        run: |
-          INPUT_OTP_VERSION='29.0.2' bash install-otp.sh
+        uses: ./
+        with:
+          otp_version: '29.0.2'
       - name: Verify
         run: |
           erl -noshell -eval 'io:format("musl erl OTP ~s~n",[erlang:system_info(otp_release)]), halt().'

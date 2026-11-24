@@ -214,14 +214,15 @@ jobs:
           tar -czf "wxWidgets-${{ steps.build-check.outputs.with_wxwidgets }}-${{ matrix.job.target }}.tar.gz" \
             -C "${{ steps.wxwidgets.outputs.install-dir }}" .
 
+      # Ubuntu 26.04 runners have no qemu-user-static package.
+      - name: Set up QEMU
+        if: steps.build-check.outputs.build == 'true'
+        uses: docker/setup-qemu-action@v4
+
       - name: Pull docker image
         if: steps.build-check.outputs.build == 'true'
         run: |
           sudo docker pull --platform="${{ matrix.job.platform }}" "${{ matrix.job.image }}"
-          if [ "${{ matrix.job.arch }}" != "$(uname -m)" ]; then
-            sudo apt update
-            sudo apt install -y binfmt-support qemu-user-static
-          fi
 
       - name: Compile OTP
         if: steps.build-check.outputs.build == 'true'

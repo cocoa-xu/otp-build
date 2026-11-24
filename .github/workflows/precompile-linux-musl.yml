@@ -171,11 +171,10 @@ jobs:
         run: |
           sudo docker pull --platform=linux/${{ matrix.arch }} ${{ steps.build-check.outputs.image }}
 
-      - name: Install binfmt
+      # Ubuntu 26.04 runners have no qemu-user-static package.
+      - name: Set up QEMU
         if: steps.build-check.outputs.build == 'true'
-        run: |
-          sudo apt update
-          sudo apt install -y binfmt-support qemu-user-static
+        uses: docker/setup-qemu-action@v4
 
       - name: Precompile
         if: steps.build-check.outputs.build == 'true'
